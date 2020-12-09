@@ -3,13 +3,12 @@ import json
 import datetime
 from flask import Flask, request, session, render_template
 import logging
-import requests
 import settings
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY')
 groupme_access_token = os.environ.get('GM_ACCESS_TOKEN')
-gm_bot_id = os.environ.get('GM_BOT_ID') #"test_bot_id": "566e3b05b73cb551006cf34410"
+gm_bot_id = os.environ.get('GM_BOT_ID')
 
 
 # Called whenever the app's callback URL receives a POST request
@@ -39,7 +38,7 @@ def get_user_names_and_ids(group_id):
     names = []
     ids = []
     url = "https://api.groupme.com/v3/groups/" + group_id + "?token="+groupme_access_token
-    response = requests.get(url)
+    response = request.get(url)
     response = json.load(response)
     if isinstance(response.get("response"), dict):
         for member in response["response"]["members"]:
