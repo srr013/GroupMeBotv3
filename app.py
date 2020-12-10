@@ -3,6 +3,8 @@ import json
 import datetime
 from flask import Flask, request, session, render_template
 import logging
+
+from requests.models import encode_multipart_formdata
 import settings
 import requests
 
@@ -21,21 +23,33 @@ def webhook():
 		logging.warn("Group_id "+ str(group_id))
 		msg = ''
 		allOptions = ["@all","@All","@ALL", "@alL", "@aLl"]
-		if group_id and any([x in payload.get("text") for x in allOptions]):
+		msg_text = payload.get("text")
+		if group_id and any([x in msg_text for x in allOptions]):
+			start_text, end_text = get_surrounding_text(msg_text)
 			gm_bot_id = os.environ.get('GM_BOT_ID_TEST')
 			if group_id == '60197068':
 				gm_bot_id = os.environ.get('GM_BOT_ID')
 			names, ids = get_user_names_and_ids(group_id)
-			msg = create_message(names)
-			send_message(msg, names, ids, gm_bot_id)
+			msg = create_mention_text(names)
+			send_message(msg, names, ids, gm_bot_id, start_text, end_text)
 		return "Sent", 200
 	else:
 		return "OK"
 
-def create_message(names):
+def get_surrounding_text(msg_text):
+	start_index = msg_text.find("@all")
+	start_text = ""
+	if start_index > 0:
+		start_text = msg_text[0:start_index]
+	end_index = start_index + len("@all")
+	end_text = msg_text[end_index:len(msg_text)]
+	return start_text, end_text
+
+def create_mention_text(names):
 	msg = ""
 	for name in names:
 		msg += "@"+name+", "
+	msg = msg[0:-1]
 	return msg
 
 def get_user_names_and_ids(group_id):
@@ -52,11 +66,11 @@ def get_user_names_and_ids(group_id):
 			ids.append(member["user_id"])
 	return names, ids
 	
-def send_message(msg, names, user_ids, bot_id):
+def send_message(msg, names, user_ids, bot_id, start_text, end_text):
 	loci = get_message_loci(msg, names)
 	if user_ids and loci:
 		d = {'bot_id': bot_id,
-				'text': msg,
+				'text': start_text + " "+msg+ " "+end_text,
 				'attachments': [
 					{"type": "mentions",
 					"loci": loci,
