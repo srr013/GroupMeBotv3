@@ -39,7 +39,7 @@ def webhook():
 		return "OK"
 
 def create_message(mentions, start_text, end_text):
-	return start_text + " " + mentions + " "+end_text
+	return start_text + mentions + end_text
 
 def get_surrounding_text(msg_text):
 	l = msg_text.lower()
@@ -88,7 +88,7 @@ def send_message(msg, names, user_ids, bot_id):
 			}
 		url = "https://api.groupme.com/v3/bots/post"
 		resp = requests.post(url, json=d)
-		if resp.status_code == 200:
+		if resp.status_code == 202:
 			logging.warn("Message Posted")
 		else:
 			logging.warn("Message failed to post: "+ str(resp.status_code))
