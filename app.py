@@ -42,8 +42,8 @@ def create_message(mentions, start_text, end_text):
 	return start_text + " " + mentions + " "+end_text
 
 def get_surrounding_text(msg_text):
-	lower = msg_text.lower
-	start_index = lower.find("@all")
+	l = msg_text.lower()
+	start_index = l.find("@all")
 	start_text = ""
 	if start_index > 0:
 		start_text = msg_text[0:start_index]
