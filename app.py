@@ -23,7 +23,7 @@ def webhook():
 		allOptions = ["@all","@All","@ALL", "@alL", "@aLl"]
 		if group_id and any([x in payload.get("text") for x in allOptions]):
 			gm_bot_id = os.environ.get('GM_BOT_ID_TEST')
-			if group_id == '55536872':
+			if group_id == '60197068':
 				gm_bot_id = os.environ.get('GM_BOT_ID')
 			names, ids = get_user_names_and_ids(group_id)
 			msg = create_message(names)
