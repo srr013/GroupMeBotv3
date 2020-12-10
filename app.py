@@ -41,7 +41,7 @@ def get_user_names_and_ids(group_id):
     names = []
     ids = []
     url = "https://api.groupme.com/v3/groups/" + group_id + "?token="+groupme_access_token
-    response = request.get(url)
+    response = requests.get(url)
     logging.warn("Response: "+response.text)
     response = json.loads(response.text)
     if response.get("members"):
