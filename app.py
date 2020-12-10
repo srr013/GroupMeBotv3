@@ -42,11 +42,12 @@ def create_message(mentions, start_text, end_text):
 	return start_text + " " + mentions + " "+end_text
 
 def get_surrounding_text(msg_text):
-	start_index = msg_text.find("@all")
+	lower = msg_text.lower
+	start_index = lower.find("@all")
 	start_text = ""
 	if start_index > 0:
 		start_text = msg_text[0:start_index]
-	end_index = start_index + len("@all")
+	end_index = start_index + 4
 	end_text = msg_text[end_index+1:len(msg_text)]
 	logging.warn("start text: "+start_text)
 	logging.warn("end text: "+end_text)
@@ -90,7 +91,7 @@ def send_message(msg, names, user_ids, bot_id):
 		if resp.status_code == 200:
 			logging.warn("Message Posted")
 		else:
-			logging.warn("Message failed to post: "+ resp.status_code)
+			logging.warn("Message failed to post: "+ str(resp.status_code))
 	else:
 		logging.warn("User IDs or loci not set")
 
