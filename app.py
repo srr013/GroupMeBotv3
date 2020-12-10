@@ -9,48 +9,49 @@ import requests
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY')
 groupme_access_token = os.environ.get('GM_ACCESS_TOKEN')
-gm_bot_id = os.environ.get('GM_BOT_ID')
-
 
 # Called whenever the app's callback URL receives a POST request
 # That'll happen every time a message is sent in the group
 @app.route('/', methods=['GET','POST'])
 def webhook():
-    if request.method == 'POST':
-        logging.warn("Request: "+json.dumps(request.get_json()))
-        payload = request.get_json()
-        group_id = payload.get('group_id')
-        logging.warn("Group_id "+ str(group_id))
-        msg = ''
-        allOptions = ["@all","@All","@ALL", "@alL", "@aLl"]
-        if group_id and any([x in payload.get("text") for x in allOptions]):
-            names, ids = get_user_names_and_ids(group_id)
-            msg = create_message(names)
-            send_message(msg, names, ids, gm_bot_id)
-        return "Sent", 200
-    else:
-        return "OK"
+	if request.method == 'POST':
+		logging.warn("Request: "+json.dumps(request.get_json()))
+		payload = request.get_json()
+		group_id = payload.get('group_id')
+		logging.warn("Group_id "+ str(group_id))
+		msg = ''
+		allOptions = ["@all","@All","@ALL", "@alL", "@aLl"]
+		if group_id and any([x in payload.get("text") for x in allOptions]):
+			gm_bot_id = os.environ.get('GM_BOT_ID_TEST')
+			if group_id == '55536872':
+				gm_bot_id = os.environ.get('GM_BOT_ID')
+			names, ids = get_user_names_and_ids(group_id)
+			msg = create_message(names)
+			send_message(msg, names, ids, gm_bot_id)
+		return "Sent", 200
+	else:
+		return "OK"
 
 def create_message(names):
-    msg = ""
-    for name in names:
-        msg += "@"+name+", "
-    return msg
+	msg = ""
+	for name in names:
+		msg += "@"+name+", "
+	return msg
 
 def get_user_names_and_ids(group_id):
-    names = []
-    ids = []
-    url = "https://api.groupme.com/v3/groups/" + group_id + "?token="+groupme_access_token
-    response = requests.get(url)
-    logging.warn("Response: "+response.text)
-    response = json.loads(response.text)
-    if response.get("response"):
-        for member in response["response"]["members"]:
-            names.append(member['nickname'])
-            logging.warn("Name identified: "+ member['nickname'])
-            ids.append(member["user_id"])
-    return names, ids
-    
+	names = []
+	ids = []
+	url = "https://api.groupme.com/v3/groups/" + group_id + "?token="+groupme_access_token
+	response = requests.get(url)
+	logging.warn("Response: "+response.text)
+	response = json.loads(response.text)
+	if response.get("response"):
+		for member in response["response"]["members"]:
+			names.append(member['nickname'])
+			logging.warn("Name identified: "+ member['nickname'])
+			ids.append(member["user_id"])
+	return names, ids
+	
 def send_message(msg, names, user_ids, bot_id):
 	loci = get_message_loci(msg, names)
 	if user_ids and loci:
