@@ -25,6 +25,9 @@ def webhook():
             names, ids = get_user_names_and_ids(group_id)
             msg = create_message(names)
             send_message(msg, names, ids, gm_bot_id)
+        return 200
+    else:
+        return 200, "OK"
 
 def create_message(users):
     msg = ""
