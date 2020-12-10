@@ -86,14 +86,14 @@ def send_message(msg, names, user_ids, bot_id):
 		if resp.status_code == 200:
 			logging.warn("Message Posted")
 		else:
-			logging.warn("Message failed to post: "+ resp.text)
+			logging.warn("Message failed to post: "+ resp.status_code)
 	else:
 		logging.warn("User IDs or loci not set")
 
 def get_message_loci(msg, names):
 	loci = []
 	for name in names:
-		start = msg.index(name)
+		start = msg.find(name)
 		if start:
 			end = start + len(name)
 			#logging.warning("Loci are: " + start +" " +end])
