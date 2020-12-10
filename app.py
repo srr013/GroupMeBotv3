@@ -63,7 +63,7 @@ def send_message(msg, names, user_ids, bot_id):
 				]
 			}
 		url = "https://api.groupme.com/v3/bots/post"
-		resp = request.post(url, json=d)
+		resp = requests.post(url, json=d)
 		if resp.status_code == 200:
 			logging.warn("Message Posted")
 		else:
