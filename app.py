@@ -23,6 +23,7 @@ def webhook():
         logging.warn("Group_id "+ str(group_id))
         msg = ''
         allOptions = ["@all","@All","@ALL", "@alL", "@aLl"]
+        logging.warn(any([x in payload.get("text") for x in allOptions]))
         if group_id and any([x in msg for x in allOptions]):
             names, ids = get_user_names_and_ids(group_id)
             msg = create_message(names)
