@@ -4,6 +4,7 @@ import datetime
 from flask import Flask, request, session, render_template
 import logging
 import settings
+import requests
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY')
@@ -15,10 +16,11 @@ gm_bot_id = os.environ.get('GM_BOT_ID')
 # That'll happen every time a message is sent in the group
 @app.route('/', methods=['GET','POST'])
 def webhook():
-    logging.warn("Request: "+request.get_json())
     if request.method == 'POST':
-        message = request.get_json()
-        group_id = message.get('response',{'group_id': None})['group_id']
+        logging.warn("Request: "+request.get_json())
+        logging.warn("Headers: "+json.dumps(request.headers)) 
+        payload = request.get_json()
+        group_id = payload.get('response',{'group_id': None})['group_id']
         logging.warn("Group_id "+ str(group_id))
         msg = ''
         allOptions = ["@all","@All","@ALL", "@alL", "@aLl"]
@@ -63,7 +65,7 @@ def send_message(msg, names, user_ids, bot_id):
 				]
 			}
 		url = "https://api.groupme.com/v3/bots/post"
-		resp = requests.post(url, json=d)
+		resp = request.post(url, json=d)
 
 def get_message_loci(msg, names):
 	loci = []
