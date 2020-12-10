@@ -19,20 +19,21 @@ def webhook():
 	if request.method == 'POST':
 		logging.warn("Request: "+json.dumps(request.get_json()))
 		payload = request.get_json()
-		group_id = payload.get('group_id')
-		logging.warn("Group_id "+ str(group_id))
-		msg = ''
-		allOptions = ["@all","@All","@ALL", "@alL", "@aLl"]
-		msg_text = payload.get("text")
-		if group_id and any([x in msg_text for x in allOptions]):
-			start_text, end_text = get_surrounding_text(msg_text)
-			gm_bot_id = os.environ.get('GM_BOT_ID_TEST')
-			if group_id == '60197068':
-				gm_bot_id = os.environ.get('GM_BOT_ID')
-			names, ids = get_user_names_and_ids(group_id)
-			mentions = create_mention_text(names)
-			msg = create_message(mentions, start_text, end_text)
-			send_message(msg, names, ids, gm_bot_id)
+		if payload['sender_type'] != "bot":
+			group_id = payload.get('group_id')
+			logging.warn("Group_id "+ str(group_id))
+			msg = ''
+			allOptions = ["@all","@All","@ALL", "@alL", "@aLl"]
+			msg_text = payload.get("text")
+			if group_id and any([x in msg_text for x in allOptions]):
+				start_text, end_text = get_surrounding_text(msg_text)
+				gm_bot_id = os.environ.get('GM_BOT_ID_TEST')
+				if group_id == '60197068':
+					gm_bot_id = os.environ.get('GM_BOT_ID')
+				names, ids = get_user_names_and_ids(group_id)
+				mentions = create_mention_text(names)
+				msg = create_message(mentions, start_text, end_text)
+				send_message(msg, names, ids, gm_bot_id)
 		return "Sent", 200
 	else:
 		return "OK"
@@ -46,7 +47,10 @@ def get_surrounding_text(msg_text):
 	if start_index > 0:
 		start_text = msg_text[0:start_index]
 	end_index = start_index + len("@all")
-	end_text = msg_text[end_index:len(msg_text)]
+	end_text = msg_text[end_index+1:len(msg_text)]
+	logging.warn("start text: "+start_text)
+	logging.warn("end text: "+end_text)
+
 	return start_text, end_text
 
 def create_mention_text(names):
