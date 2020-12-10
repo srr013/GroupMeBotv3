@@ -45,9 +45,10 @@ def get_user_names_and_ids(group_id):
     ids = []
     url = "https://api.groupme.com/v3/groups/" + group_id + "?token="+groupme_access_token
     response = request.get(url)
-    response = json.load(response)
+    logging.warn("Response: "+response.text)
+    response = json.loads(response.text)
     if isinstance(response.get("response"), dict):
-        for member in response["response"]["members"]:
+        for member in response["members"]:
             names.append(member['nickname'])
             logging.warn("Name identified: "+ member['nickname'])
             ids.append(member["user_id"])
