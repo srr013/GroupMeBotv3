@@ -17,7 +17,7 @@ gm_bot_id = os.environ.get('GM_BOT_ID')
 @app.route('/', methods=['GET','POST'])
 def webhook():
     if request.method == 'POST':
-        logging.warn("Request: "+request.get_json())
+        logging.warn("Request: "+json.dumps(request.get_json()))
         logging.warn("Headers: "+json.dumps(request.headers)) 
         payload = request.get_json()
         group_id = payload.get('response',{'group_id': None})['group_id']
