@@ -19,7 +19,7 @@ def webhook():
     if request.method == 'POST':
         logging.warn("Request: "+json.dumps(request.get_json()))
         payload = request.get_json()
-        group_id = payload.get('response',{'group_id': None})['group_id']
+        group_id = payload.get('group_id')
         logging.warn("Group_id "+ str(group_id))
         msg = ''
         allOptions = ["@all","@All","@ALL", "@alL", "@aLl"]
