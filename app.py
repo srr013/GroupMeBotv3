@@ -44,8 +44,8 @@ def get_user_names_and_ids(group_id):
     response = requests.get(url)
     logging.warn("Response: "+response.text)
     response = json.loads(response.text)
-    if response.get("members"):
-        for member in response["members"]:
+    if response.get("response"):
+        for member in response["response"]["members"]:
             names.append(member['nickname'])
             logging.warn("Name identified: "+ member['nickname'])
             ids.append(member["user_id"])
