@@ -23,8 +23,7 @@ def webhook():
         logging.warn("Group_id "+ str(group_id))
         msg = ''
         allOptions = ["@all","@All","@ALL", "@alL", "@aLl"]
-        logging.warn(any([x in payload.get("text") for x in allOptions]))
-        if group_id and any([x in msg for x in allOptions]):
+        if group_id and any([x in payload.get("text") for x in allOptions]):
             names, ids = get_user_names_and_ids(group_id)
             msg = create_message(names)
             send_message(msg, names, ids, gm_bot_id)
@@ -32,12 +31,10 @@ def webhook():
     else:
         return "OK"
 
-def create_message(users):
+def create_message(names):
     msg = ""
-    user_ids = []
-    for user in users:
-        msg += "@"+user[0]+", "
-        user_ids.append(user[1])
+    for name in names:
+        msg += "@"+name+", "
     return msg
 
 def get_user_names_and_ids(group_id):
@@ -47,7 +44,7 @@ def get_user_names_and_ids(group_id):
     response = request.get(url)
     logging.warn("Response: "+response.text)
     response = json.loads(response.text)
-    if isinstance(response.get("response"), dict):
+    if response.get("members"):
         for member in response["members"]:
             names.append(member['nickname'])
             logging.warn("Name identified: "+ member['nickname'])
@@ -57,16 +54,23 @@ def get_user_names_and_ids(group_id):
 def send_message(msg, names, user_ids, bot_id):
 	# loop through users
 		loci = get_message_loci(msg, names, user_ids) #need to insert '@username' in the text, identify start and end indices per-use
-		d = {'bot_id': bot_id,
-				'text': msg,
-				'attachments': [
-					{"type": "mentions",
-					"loci": loci,
-					"user_ids": user_ids}
-				]
-			}
-		url = "https://api.groupme.com/v3/bots/post"
-		resp = request.post(url, json=d)
+		if user_ids and loci:
+			d = {'bot_id': bot_id,
+					'text': msg,
+					'attachments': [
+						{"type": "mentions",
+						"loci": loci,
+						"user_ids": user_ids}
+					]
+				}
+			url = "https://api.groupme.com/v3/bots/post"
+			resp = request.post(url, json=d)
+			if resp.status_code == 200:
+				logging.warn("Message Posted")
+			else:
+				logging.warn("Message failed to post: "+ resp.text)
+		else:
+			logging.warn("User IDs or loci not set")
 
 def get_message_loci(msg, names):
 	loci = []
@@ -74,6 +78,6 @@ def get_message_loci(msg, names):
 		start = msg.index(name)
 		if start:
 			end = start + len(name)
-		#logging.warning("Loci are: " + start +" " +end])
-		loci.append([start, end])
+			#logging.warning("Loci are: " + start +" " +end])
+			loci.append([start, end])
 	return loci
