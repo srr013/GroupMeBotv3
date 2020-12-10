@@ -52,25 +52,24 @@ def get_user_names_and_ids(group_id):
     return names, ids
     
 def send_message(msg, names, user_ids, bot_id):
-	# loop through users
-		loci = get_message_loci(msg, names, user_ids) #need to insert '@username' in the text, identify start and end indices per-use
-		if user_ids and loci:
-			d = {'bot_id': bot_id,
-					'text': msg,
-					'attachments': [
-						{"type": "mentions",
-						"loci": loci,
-						"user_ids": user_ids}
-					]
-				}
-			url = "https://api.groupme.com/v3/bots/post"
-			resp = request.post(url, json=d)
-			if resp.status_code == 200:
-				logging.warn("Message Posted")
-			else:
-				logging.warn("Message failed to post: "+ resp.text)
+	loci = get_message_loci(msg, names)
+	if user_ids and loci:
+		d = {'bot_id': bot_id,
+				'text': msg,
+				'attachments': [
+					{"type": "mentions",
+					"loci": loci,
+					"user_ids": user_ids}
+				]
+			}
+		url = "https://api.groupme.com/v3/bots/post"
+		resp = request.post(url, json=d)
+		if resp.status_code == 200:
+			logging.warn("Message Posted")
 		else:
-			logging.warn("User IDs or loci not set")
+			logging.warn("Message failed to post: "+ resp.text)
+	else:
+		logging.warn("User IDs or loci not set")
 
 def get_message_loci(msg, names):
 	loci = []
