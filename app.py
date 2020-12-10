@@ -30,11 +30,15 @@ def webhook():
 			if group_id == '60197068':
 				gm_bot_id = os.environ.get('GM_BOT_ID')
 			names, ids = get_user_names_and_ids(group_id)
-			msg = create_mention_text(names)
-			send_message(msg, names, ids, gm_bot_id, start_text, end_text)
+			mentions = create_mention_text(names)
+			msg = create_message(mentions, start_text, end_text)
+			send_message(msg, names, ids, gm_bot_id)
 		return "Sent", 200
 	else:
 		return "OK"
+
+def create_message(mentions, start_text, end_text):
+	return start_text + " " + mentions + " "+end_text
 
 def get_surrounding_text(msg_text):
 	start_index = msg_text.find("@all")
@@ -49,7 +53,7 @@ def create_mention_text(names):
 	msg = ""
 	for name in names:
 		msg += "@"+name+", "
-	msg = msg[0:-1]
+	msg = msg[0:-2]
 	return msg
 
 def get_user_names_and_ids(group_id):
@@ -66,11 +70,11 @@ def get_user_names_and_ids(group_id):
 			ids.append(member["user_id"])
 	return names, ids
 	
-def send_message(msg, names, user_ids, bot_id, start_text, end_text):
+def send_message(msg, names, user_ids, bot_id):
 	loci = get_message_loci(msg, names)
 	if user_ids and loci:
 		d = {'bot_id': bot_id,
-				'text': start_text + " "+msg+ " "+end_text,
+				'text': msg,
 				'attachments': [
 					{"type": "mentions",
 					"loci": loci,
