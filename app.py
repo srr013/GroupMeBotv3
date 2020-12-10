@@ -15,6 +15,7 @@ gm_bot_id = os.environ.get('GM_BOT_ID')
 # That'll happen every time a message is sent in the group
 @app.route('/', methods=['GET','POST'])
 def webhook():
+    logging.warn("Request: "+request.get_json())
     if request.method == 'POST':
         message = request.get_json()
         group_id = message.get('response',{'group_id': None})['group_id']
@@ -27,7 +28,7 @@ def webhook():
             send_message(msg, names, ids, gm_bot_id)
         return 200
     else:
-        return 200, "OK"
+        return "OK"
 
 def create_message(users):
     msg = ""
