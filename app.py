@@ -59,6 +59,7 @@ def create_mention_text(names):
 	for name in names:
 		msg += "@"+name+", "
 	msg = msg[0:-2]
+	msg += " "
 	return msg
 
 def get_user_names_and_ids(group_id):
