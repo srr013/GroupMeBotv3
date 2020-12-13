@@ -2,4 +2,3 @@ Flask
 gunicorn==19.6.0
 python-dotenv
 requests
-bs4
