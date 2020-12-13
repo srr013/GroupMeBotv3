@@ -59,7 +59,7 @@ class Response():
         houseList = self.getHouseList(command[1])
         random.shuffle(houseList)
         names = self.group.memberNames.copy()
-        if len(command) > 1:
+        if len(command) > 2:
             names = self.getMemberNamesFromInput(command[2])
         random.shuffle(names)
         t = 'House Assignment: \n'
