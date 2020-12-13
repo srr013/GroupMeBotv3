@@ -77,6 +77,8 @@ class Response():
         text = players.lower()
         text.split(",")
         names = []
+        if isinstance(players, str):
+            players = [players]
         for p in text:
             for member in self.group.memberNames:
                 logging.warn('P: {}, Member: {}'.format(p, member))
