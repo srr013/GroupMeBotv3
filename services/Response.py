@@ -40,9 +40,10 @@ class Response():
         self.responseType = 'mention'
 
     def randomHouseDraw(self):
-        houseList = ['Lannister', 'Baratheon', 'Tyrell', 'Stark', 'Martell']
+        houseList = ['Lannister']#, 'Baratheon', 'Tyrell', 'Stark', 'Martell']
         random.shuffle(houseList)
-        names = random.shuffle(self.group.memberNicknames)
+        names = self.group.memberNicknames.copy()
+        random.shuffle(names)
         t = 'House Assignment: \n'
         if len(houseList) == len(names):
             for name in names:
