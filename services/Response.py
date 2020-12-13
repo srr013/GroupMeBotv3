@@ -1,6 +1,7 @@
 import requests
 import logging
 import random
+import json
 
 class Response():
     def __init__(self, group, analyzer):
@@ -68,6 +69,8 @@ class Response():
             self.responseText = t
         else:
             logging.warn("Game requested does not match user list")
+            logging.warn('Names: {}'.format(names))
+            logging.warn('HouseList: {}'.format(houseList))
             self.responseText = "Invalid input provided"
 
     def getMemberNamesFromInput(self, players):
@@ -76,6 +79,7 @@ class Response():
         names = []
         for p in text:
             for member in self.group.memberNames:
+                logging.warn('P: {}, Member: {}'.format(p, member))
                 if p in member.lower():
                     names.append(member)
         return names
