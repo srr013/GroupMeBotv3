@@ -22,12 +22,13 @@ class Group():
         self.rawData = self.getRawData(groupId, groupme_access_token)
         self.groupType = "Test"
         self.gmBotId = os.environ.get('GM_BOT_ID_TEST')
+        self.data = {}
         prdIds = ['60197068']
         if groupId in prdIds:
             self.gmBotId = os.environ.get('GM_BOT_ID')
         if self.rawData:
+            self.data = json.loads(self.rawData.text)
             if self.data.get("response"):
-                self.data = json.loads(self.rawData.text)
                 self.memberNicknames = self.getMembers()
                 self.memberIds = self.getMemberIds()
                 self.memberNames = self.getNames()
