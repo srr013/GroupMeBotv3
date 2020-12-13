@@ -30,6 +30,9 @@ def webhook():
 			elif analyzer.randomHouseSelector():
 				response.randomHouseDraw()
 				response.send()
+			elif analyzer.help():
+				response.help()
+				response.send()
 		return "Sent", 200
 	else:
 		return "OK"
