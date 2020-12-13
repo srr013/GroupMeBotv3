@@ -72,7 +72,7 @@ class Response():
     def get_message_loci(self):
         loci = []
         for name in self.group.memberNicknames:
-            start = self.analyzer.messageText.find(name)
+            start = self.responseText.find(name)
             if start:
                 end = start + len(name)
                 #logging.warning("Loci are: " + start +" " +end])
