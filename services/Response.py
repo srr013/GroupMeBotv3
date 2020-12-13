@@ -36,7 +36,7 @@ class Response():
     def mentionAll(self):
         start_text, end_text = self.get_surrounding_text()
         mentions = self.create_mention_text()
-        self.responseText = start_text + ' | '+ mentions + ' | '+ end_text
+        self.responseText = start_text + ' '+ mentions + ' '+ end_text
         self.responseType = 'mention'
 
     def randomHouseDraw(self):
@@ -64,14 +64,14 @@ class Response():
 
     def create_mention_text(self):
         msg = ""
-        for name in self.group.memberNames:
+        for name in self.group.memberNicknames:
             msg += "@"+name+", "
         msg = msg[0:-2]
         return msg
 
     def get_message_loci(self):
         loci = []
-        for name in self.group.memberNames:
+        for name in self.group.memberNicknames:
             start = self.analyzer.messageText.find(name)
             if start:
                 end = start + len(name)
