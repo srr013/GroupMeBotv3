@@ -28,6 +28,13 @@ class MessageAnalyzer():
         return False
 
     def randomHouseSelector(self):
-        if "--randomhouses" in self.messageText.lower():
-            return True
+        for m in ['--randomhouses', '-randomhouses', '\u2014randomhouses']:
+            if m in self.messageText.lower():
+                return True
+        return False
+
+    def help(self):
+        for m in ['--help', '-help', '\u2014help']:
+            if m in self.messageText.lower():
+                return True
         return False

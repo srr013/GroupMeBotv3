@@ -32,7 +32,21 @@ class Response():
                 logging.warn("Message Posted")
             else:
                 logging.warn("Message failed to post: "+ str(resp.status_code))
-                
+    
+    def help(self):
+        self.responseText = """
+        The following commands are supported: \n
+
+        @all - tag all users in the GroupMe \n
+
+        --randomhouses <gamename> <userlist:comma-delimited> \n
+        ex: --randomhouses 3p scott,steve,maulik \n
+        supported games: RTKL, NKFD, RITS, SITN, 3p \n
+        If the game size does not match the number of groupme members then you must specify the members to include \n
+        Don't include spaces in the message except between parameters \n
+        Player names should be separated by commas\n
+        """
+
     def mentionAll(self):
         start_text, end_text = self.get_surrounding_text()
         mentions = self.create_mention_text()
@@ -40,18 +54,44 @@ class Response():
         self.responseType = 'mention'
 
     def randomHouseDraw(self):
-        houseList = ['Lannister']#, 'Baratheon', 'Tyrell', 'Stark', 'Martell']
+        command = self.analyzer.messageText.split(" ")
+        houseList = self.getHouseList(command[1])
         random.shuffle(houseList)
-        names = self.group.memberNicknames.copy()
+        names = self.getMemberNamesFromInput(command[2])
         random.shuffle(names)
         t = 'House Assignment: \n'
-        if len(houseList) == len(names):
+        if len(names > 0) and len(houseList) == len(names):
             for name in names:
                 t += name + ': ' + houseList[names.index(name)] + '\n'
             self.responseText = t
         else:
             logging.warn("Game requested does not match user list")
+            self.responseText = "Invalid input provided"
 
+    def getMemberNamesFromInput(self, players):
+        text = players.lower()
+        text.split(",")
+        names = []
+        for p in text:
+            for member in self.group.memberNames:
+                if p in member.lower():
+                    names.append(member)
+        return names
+
+    def getHouseList(self, game):
+        text = game.lower()
+        houseList = []
+        if 'rtkl' in text:
+            houseList = ['Lannister', 'Greyjoy', 'Tyrell', 'Stark', 'Martell']
+        elif 'nkfd' in text:
+            houseList = ['Lannister', 'Baratheon', 'Tyrell', 'Stark', 'Martell']
+        elif 'rits' in text:
+            houseList = ['Lannister', 'Baratheon', 'Tyrell', 'Martell']
+        elif 'sitn' in text:
+            houseList = ['Lannister', 'Baratheon', 'GreyJoy', 'Stark']
+        elif '3p' in text:
+            houseList = ['Lannister', 'Baratheon', 'Stark']
+        return houseList
 
     def get_surrounding_text(self):
         l = self.analyzer.messageText.lower()
