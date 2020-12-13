@@ -3,7 +3,7 @@ class MessageAnalyzer():
     def __init__(self, payload):
         self.payload = payload
         self.messageText = payload.get("text")
-        self.isGroupmePost = self.isValidPost()
+        self.isGroupmePost = self.validateGroupmePost()
 
     def validateGroupmePost(self, allowBot=False):
         isValid = False
