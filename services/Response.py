@@ -93,6 +93,8 @@ class Response():
             houseList = ['Lannister', 'Baratheon', 'GreyJoy', 'Stark']
         elif '3p' in text:
             houseList = ['Lannister', 'Baratheon', 'Stark']
+        elif 'test' in text:
+            houseList = ['TestHouseFor1User']
         return houseList
 
     def get_surrounding_text(self):
