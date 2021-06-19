@@ -2,63 +2,82 @@ import requests
 import json
 import logging
 import os
+from sqlalchemy.dialects.postgresql import JSON
+from app import db
+import services.config as config
 
-# def get_user_names_and_ids(groupme_access_token, group_id):
-#     names = []
-#     ids = []
-#     url = "https://api.groupme.com/v3/groups/" + group_id + "?token="+groupme_access_token
-#     response = requests.get(url)
-#     logging.warn("Response: "+response.text)
-#     response = json.loads(response.text)
-#     if response.get("response"):
-#         for member in response["response"]["members"]:
-#             names.append(member['nickname'])
-#             logging.warn("Name identified: "+ member['nickname'])
-#             ids.append(member["user_id"])
-#     return names, ids
+import models.MessageTypes.Help as Help
+import models.MessageTypes.MentionAll as MentionAll
+import models.MessageTypes.MessagingServiceStatus as MessagingServiceStatus
+import models.MessageTypes.RandomHouseDraw as RandomHouseDraw
+import models.MessageTypes.RandomInsult as RandomInsult
+import models.MessageTypes.StartMessagingService as StartMessagingService
+import models.MessageTypes.StopMessagingService as StopMessagingService
 
-class Group():
-    def __init__(self, groupId, groupme_access_token):
-        self.rawData = self.getRawData(groupId, groupme_access_token)
-        self.groupType = "Test"
-        self.gmBotId = os.environ.get('GM_BOT_ID_TEST')
-        self.data = {}
-        prdIds = ['60197068']
-        if groupId in prdIds:
-            self.gmBotId = os.environ.get('GM_BOT_ID')
-        if self.rawData:
-            self.data = json.loads(self.rawData.text)
-            if self.data.get("response"):
-                self.memberNicknames = self.getMembers()
-                self.memberIds = self.getMemberIds()
-                self.memberNames = self.getNames()
-                
-        else:
-            logging.error("Could not retrieve or parse group API data")
+import models.MessageTypes.messageTypes as systemMessageTypes
 
-    def getRawData(self, group_id, groupme_access_token):
-        url = "https://api.groupme.com/v3/groups/" + group_id + "?token="+groupme_access_token
-        response = requests.get(url)
-        if response.status_code == 200:
-            return response
-        else:
-            return {}
-    
-    def getMembers(self):
-        members = []
-        for member in self.data["response"]["members"]:
-            members.append(member['nickname'])
-        return members
-        
-        
-    def getMemberIds(self):
-        memberIds = []
-        for member in self.data["response"]["members"]:
-            memberIds.append(member['user_id'])
-        return memberIds
+class Group(db.Model):
+    __tablename__ = 'groups'
+    id = db.Column(db.Integer, primary_key=True)
+    groupId = db.Column(db.String())
+    groupName = db.Column(db.String())
+    botIds = db.Column(JSON)
+    counter_lowerBound = db.Column(db.Integer)
+    counter_upperBound = db.Column(db.Integer)
+    counter_currentThreshold = db.Column(db.Integer)
+    counter_current = db.Column(db.Integer)
+    messageTypes = db.Column(JSON)
+    active = db.Column(db.Boolean)
+    messagingServiceStatus = db.Column(db.Boolean)
 
-    def getNames(self):
-        names = []
-        for member in self.data["response"]["members"]:
-            names.append(member['name'])
-        return names
+
+    def __init__(self, groupId, botIds, groupName):
+        self.groupId = groupId
+        self.groupName = groupName
+        self.botIds = botIds
+        self.counter_lowerBound = 10
+        self.counter_upperBound = 15
+        self.counter_currentThreshold = self.counter_upperBound
+        self.counter_current = 0
+        self.active = True
+        self.messagingServiceStatus = True
+        self.messageTypes = {}
+        self.messageObjectList = []
+
+
+    def __repr__(self):
+        return '<id {}>'.format(self.id)
+
+    def createGroupData(self):
+        self.setMessageTypes()
+
+    def initializeGroupData(self):
+        if isinstance(self.messageTypes, str):
+            self.messageTypes = json.loads(self.messageTypes)
+        self.getMessageObjects
+
+    def getMessageObjects(self):
+        messageObjectList = []
+        for messageType in systemMessageTypes.types:
+            module = eval("%s.%s()" % (messageType, messageType))
+            for mType in self.messageTypes:
+                if mType.get('name') == module.__class__.__name__ and mType.get('active'):
+                    messageObjectList.append(module)
+        return messageObjectList
+
+
+    def setMessageTypes(self):
+        messageTypeList = []
+        for messageType in systemMessageTypes.types:
+            module = eval("%s.%s()" % (messageType, messageType))
+            messageTypeList.append(module.typeDefinition)
+        self.messageTypes = json.dumps(messageTypeList)
+
+    def deserialize(self):
+        group = json.dumps({
+            "Group Name": self.groupName,
+            "Bot IDs": json.dumps(self.botIds),
+            "Message Counter": str(self.counter_current) +"/"+ str(self.counter_currentThreshold),
+            "Message Counter Bounds": str(self.counter_lowerBound) +"/"+ str(self.counter_upperBound)
+        })
+        return group

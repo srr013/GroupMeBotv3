@@ -2,3 +2,7 @@ Flask
 gunicorn==19.6.0
 python-dotenv
 requests
+psycopg2==2.8.4 
+Flask-SQLAlchemy===2.4.1
+Flask-Migrate==2.5.2
+Flask-Script==2.0.6

@@ -1,0 +1,27 @@
+openapi: '3.0.2'
+info:
+  title: Insult Bot
+  version: '3.0'
+servers:
+  - url: https://localhost:5000
+paths:
+  /healthCheck:
+    get:
+      responses:
+        '200':
+          description: Fuck yourself!
+  /:
+    post:
+      responses:
+        '401':
+          description: "Invalid Post format"
+        '204':
+          description: "No Message Posted"
+        '200':
+          description: A response from the bot
+          content:
+            application/json:
+              schema: 
+                type: object
+  # /api/authorize:
+      # get:

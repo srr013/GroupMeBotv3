@@ -1,0 +1,94 @@
+6.6 Review
+
+Test - does it work with multiple groups?
+Migration files - can we setup the database automatically locally and in Heroku?
+
+store responses to database via response.serialize
+    -finish up the API calls with SQLAlchemy - GET and DELETE, POST should upsert
+    -add inboundMessage and outboundMessage storage to DB
+    
+
+Need an API for each action from the front end. What does the action do in the database? 
+    What should the server figure out? What needs to come in from the API?
+Add activeStatus (active, deleted) to Group DB
+Stop using _. use snakeCase
+Find a way to load message types once at startup rather than every time a message is received (app line 39)
+
+
+API interactions with the front end:
+-accept user sign in request > provide jwt
+    /authorize route should accept an inbound Google payload, validate it, and issue a JWT
+    JWT should be delivered to client in a cookie
+    client session is checked for authorized requests. 
+        If cookie exists then validate signature and exp.
+
+        Can I do server-side storage for testing?
+            Redis? https://elements.heroku.com/addons/redistogo is free
+
+-display user's home page
+    -GET bots
+    -GET demographics/settings
+-bots
+    -POST to upsert
+    -DELETE to delete
+
+
+
+
+
+
+Next:
+Have the sign-in in Vue. Now need to coordinate the sign-in
+between Vue and flask. Include flask-cors. Start basic API comms.
+-When the user
+
+
+From IB:
+self-aware
+encouragement
+image (meme)
+talking-self
+talking-bot
+tldr
+
+fantasy:
+    scoreboard
+    transactions
+
+new:
+exclude me / include me / group include status
+timing triggers/scheduling
+heated-convo
+swearing
+
+
+
+front end:
+home page
+    login
+        -Allows the user to login
+        -Show text indicating the user tried to access a page requiring a valid jwt if query parameter=true
+        -Via google only for now
+        -provisions a jwt via session storage on successful login from Google
+        -redirect to /home
+
+    authenticated
+        -@Requires auth
+        -Contains widgets for:
+            Bots
+            User
+            Groups - whats the difference between bots? Allow users outside the bot owner to customize?
+
+Widgets
+    bots
+        create bot button
+        bot page
+            turn bot messaging off/on
+            delete bot
+            turn functionalities off/on
+                Message Types
+                    Checkbox list of all Message Types
+            customize insult list
+            fantasy integration
+            timing triggers
+            
