@@ -72,13 +72,13 @@ def parseMessage(request, group):
 def validateGroupmePost(payload, allowBot=False):
     isValid = False
     if allowBot:
-        if payload.get('sender_type') \
+        if payload.get('sender_type') != "system"\
             and payload.get('text') \
                 and payload.get('group_id') \
                     and payload.get("source_guid"):
             isValid = True
     else:
-        if payload.get('sender_type') != "bot" \
+        if payload.get('sender_type') not in ["bot", "system"] \
             and payload.get('sender_type') \
                 and payload.get('group_id') \
                     and payload.get('text')  \
