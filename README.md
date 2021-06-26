@@ -9,3 +9,5 @@ To update the DB on heroku:  heroku run python manage.py db upgrade
     -make sure the SQLALCHEMY_DATABASE_URI app.config value is set, not just env.
 
 Always migrate then upgrade
+
+If you need to change a data type then truncate tables including the alembic_version table (non-prd). Then db init, etc.

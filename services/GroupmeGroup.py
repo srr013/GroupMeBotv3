@@ -17,6 +17,8 @@ class GroupmeGroup():
                 self.memberIds = self.getMemberIds()
                 self.memberNames = self.getNames()
                 self.groupName = self.data['response']['name']
+                if not self.group.groupName:
+                    self.group.groupName = self.groupName
         else:
             logging.error("Group creation failed: Could not retrieve or parse GroupMe API data")
         self.messageObjects = []

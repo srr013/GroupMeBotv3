@@ -21,4 +21,4 @@ class RandomInsult(Default.DefaultMessageType):
         if random.randint(0, 99) > 50:
             if " " not in m:
                 m+= " " + insults.insults[random.randint(0,len(insults.insults)-1)]
-        return "@"+self.inboundUser + " is "+a+" "+ m
+        return "@"+payload.get("name") + " is "+a+" "+ m

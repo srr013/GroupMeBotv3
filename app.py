@@ -6,12 +6,13 @@ from flask_sqlalchemy import SQLAlchemy
 import logging
 import importlib
 import random
+import requests
 
 import settings
 import services.config as config
 
-import models.User as User
-from models.GroupmeGroup import GroupmeGroup
+
+from services.GroupmeGroup import GroupmeGroup
 
 import services.InboundMessage as InboundMessage
 
@@ -24,16 +25,21 @@ db = SQLAlchemy(app)
 
 #import after db is set
 from models.Group import Group
+from models.User import User
+from models.Bot import Bot
+
 
 # Called whenever the app's callback URL receives a POST request
 # That'll happen every time a message is sent in the group
 @app.route('/', methods=['GET','POST'])
-def webhook():
+@app.route('/<groupId>', methods=['GET','POST'])
+def webhook(groupId = ''):
 	res = "No Message Posted"
 	respStatus = 204
 	if request.method == 'POST':
 		payload = request.get_json()
-		groupId = payload.get('group_id')
+		if not groupId:
+			groupId = payload.get('group_id')
 		if groupId:
 			g = db.session.query(Group).filter_by(groupId=groupId).first()
 			g.initializeGroupData()
@@ -71,18 +77,18 @@ def manageGroups(id = ''):
 		#TODO secure this endpoint
 		payload = request.get_json()
 		groupId = payload.get('groupId')
-		botIds = payload.get('botIds')
+		botId = payload.get('botId')
 		groupName = payload.get('groupName', "default")
 		if payload and groupId:
 			g = db.session.query(Group).filter_by(groupId=groupId).first()
 			if not g:
-				group = Group(groupId, botIds, groupName)
+				group = Group(groupId, botId, groupName)
 				group.createGroupData()
 				db.session.add(group)
 				db.session.commit()
 				return "Group created", 201
 			else:
-				g.botIds = botIds
+				g.botId = botId
 				g.groupName = groupName
 				g.messageTypes = payload.get('messageTypes', '{}')
 				db.session.commit()
@@ -103,3 +109,68 @@ def manageGroups(id = ''):
 			return "Group not found. Request missing data or not formatted", 400
 	else:
 		return "Method not allowed", 405
+
+@app.route('/api/groupmegroups', methods=['GET'])
+def manageGroupMeGroups(id = ''):
+	if request.method == 'GET':
+		url = "https://api.groupme.com/v3/groups?token="+config.GROUPME_ACCESS_TOKEN
+		groups = requests.get(url)
+		if groups:
+			return groups.text, 200
+		return "No groups found with provided access token", 400
+
+@app.route('/api/bots', methods=['GET', 'POST'])
+@app.route('/api/bots/<id>', methods=['GET', 'DELETE'])
+def manageBots(id = ''):
+	if request.method == 'POST':
+		payload = request.get_json()
+		groupId = str(payload.get('groupId'))
+		g = db.session.query(Group).filter_by(groupId=groupId).first()
+		if not g or groupId in config.TEST_GROUPS:
+			botName = payload.get('botName')
+			botCallbackUrl = payload.get('botCallbackUrl')
+			avatarUrl = payload.get('avatarUrl')
+			groupName = payload.get('groupName')
+			url = "https://api.groupme.com/v3/bots?token="+config.GROUPME_ACCESS_TOKEN
+			body = {
+				"bot": {
+					"name": botName,
+					"group_id": groupId,
+				}
+			}
+			if botCallbackUrl:
+				body['bot']['callback_url'] = botCallbackUrl
+			if avatarUrl:
+				body['bot']['avatar_url'] = avatarUrl
+			headers = {
+				"Content-Type": "application/json"
+			}
+			res = requests.post(url, data=json.dumps(body), headers=headers)
+			if res.status_code == 201:
+				botData = res.json()
+				botData = botData['response']['bot']
+				bot = Bot(botData['bot_id'], botData['name'], botData['callback_url'], botData['avatar_url'])
+				group = Group(groupId, bot.id, groupName)
+				group.createGroupData()
+				db.session.add(bot)
+				db.session.add(group)
+				db.session.commit()
+				return "Bot created!", 201
+			else:
+				return f'Something happened: {res.content}', 400
+		else:
+			return f'Group {groupId} already has a bot assigned'
+	elif request.method == 'DELETE' and id:
+		b = db.session.query(Bot).filter_by(id=id).first()
+		db.session.delete(b)
+		db.session.commit()
+		return "Bot deleted", 200
+	elif request.method == 'GET':
+		if id:
+			botList = [db.session.query(Bot).filter_by(id=id).first()]
+		else:
+			botList = db.session.query(Bot).all()
+		logging.warn(botList)
+		return json.dumps([b.deserialize() for b in botList]), 200
+	else:
+		return "method not supported", 204

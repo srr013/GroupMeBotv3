@@ -18,7 +18,7 @@ class Response():
             url = 'https://api.groupme.com/v3/bots/post'
             body = {}
             if self.messageObject.responseType == 'mention':
-                body = {'bot_id': self.group.group.botIds['groupme'],
+                body = {'bot_id': self.group.group.botId,
                         'text': responseText,
                         'attachments': [
                             {"type": "mentions",
@@ -28,7 +28,7 @@ class Response():
                     }
             elif self.messageObject.responseType == 'text':
                 body = {
-                    'bot_id': self.group.group.botIds['groupme'],
+                    'bot_id': self.group.group.botId,
                     'text': responseText
                 }
             if self.inboundMessagePayload.get("sendMessage", True):

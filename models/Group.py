@@ -3,6 +3,8 @@ import json
 import logging
 import os
 from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import relationship
 from app import db
 import services.config as config
 
@@ -21,7 +23,7 @@ class Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     groupId = db.Column(db.String())
     groupName = db.Column(db.String())
-    botIds = db.Column(JSON)
+    botId = db.Column(db.String(), ForeignKey('bots.id'))
     counter_lowerBound = db.Column(db.Integer)
     counter_upperBound = db.Column(db.Integer)
     counter_currentThreshold = db.Column(db.Integer)
@@ -30,11 +32,13 @@ class Group(db.Model):
     active = db.Column(db.Boolean)
     messagingServiceStatus = db.Column(db.Boolean)
 
+    bot = relationship("Bot", back_populates="groups")
 
-    def __init__(self, groupId, botIds, groupName):
+
+    def __init__(self, groupId, botId, groupName):
         self.groupId = groupId
         self.groupName = groupName
-        self.botIds = botIds
+        self.botId = botId
         self.counter_lowerBound = 10
         self.counter_upperBound = 15
         self.counter_currentThreshold = self.counter_upperBound
@@ -76,7 +80,7 @@ class Group(db.Model):
     def deserialize(self):
         group = json.dumps({
             "Group Name": self.groupName,
-            "Bot IDs": json.dumps(self.botIds),
+            "Bot ID": self.botId,
             "Message Counter": str(self.counter_current) +"/"+ str(self.counter_currentThreshold),
             "Message Counter Bounds": str(self.counter_lowerBound) +"/"+ str(self.counter_upperBound)
         })
