@@ -80,7 +80,10 @@ class Group(db.Model):
     def deserialize(self):
         group = json.dumps({
             "Group Name": self.groupName,
+            "Group ID": self.groupId,
             "Bot ID": self.botId,
+            "Message Types": self.messageTypes,
+            "Messaging Status": self.messagingServiceStatus,
             "Message Counter": str(self.counter_current) +"/"+ str(self.counter_currentThreshold),
             "Message Counter Bounds": str(self.counter_lowerBound) +"/"+ str(self.counter_upperBound)
         })
