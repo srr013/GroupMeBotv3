@@ -33,7 +33,6 @@ def parseMessageContent(payload, group, response):
     inboundMessage = payload.get('text')
 
     if validateGroupmePost(payload):
-        group.group.counter_current += 1
         #create the message type modules and 
         #check if inbound text meets any qualifyingText parameters
         group.messageObjects = group.group.getMessageObjects()

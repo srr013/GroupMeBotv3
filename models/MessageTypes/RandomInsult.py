@@ -26,3 +26,4 @@ class RandomInsult(Default.DefaultMessageType):
     def updateGroup(self, group):
         group.counter_current = 0
         group.counter_currentThreshold = random.randint(group.counter_lowerBound, group.counter_upperBound)
+        return

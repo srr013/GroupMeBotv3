@@ -8,6 +8,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import ARRAY
 from app import db
 import services.config as config
+import random
 
 import models.MessageTypes.Help as Help
 import models.MessageTypes.MentionAll as MentionAll
@@ -58,9 +59,12 @@ class Group(db.Model):
         self.setMessageTypes()
 
     def initializeGroupData(self):
+        if self.counter_current > self.counter_currentThreshold:
+            self.counter_current = 0
+            self.counter_currentThreshold = random.randint(self.counter_lowerBound, self.counter_upperBound)
         if isinstance(self.messageTypes, str):
             self.messageTypes = json.loads(self.messageTypes)
-        self.getMessageObjects
+        self.getMessageObjects()
 
     def getMessageObjects(self):
         messageObjectList = []

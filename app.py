@@ -43,29 +43,33 @@ def webhook(groupId = ''):
 			groupId = payload.get('group_id')
 		if groupId:
 			g = db.session.query(Group).filter_by(groupId=groupId).first()
-			g.initializeGroupData()
-			group = GroupmeGroup(g)
-			response = MessageResponse(group, payload)
-			response.messageObject = InboundMessage.parseMessageContent(payload, group, response)
-			if not response.messageObject:
-				if group.readyForMessage():
-					response.messageObject = response.getTriggeredResponse(group)
-			    #send the queued message
-			if response.messageObject:
-				response.responseText = response.messageObject.constructResponseText(payload, response)
-				response.messageObject.updateGroup(g)
-				outboundMessage = OutboundMessage.OutboundMessage(response)
-				db.session.add(outboundMessage)
-				res, respStatus = response.send()
-			db.session.commit()
+			if g:
+				g.initializeGroupData()
+				group = GroupmeGroup(g)
+				response = MessageResponse(group, payload)
+
+				#set the messageObject to send the message from that object
+				#check for written triggers
+				response.messageObject = InboundMessage.parseMessageContent(payload, group, response)
+				#check for random content
+				if not response.messageObject:
+					if group.readyForMessage():
+						response.messageObject = response.getTriggeredResponse(group)
+				
+				#send the queued message
+				if response.messageObject:
+					response.responseText = response.messageObject.constructResponseText(payload, response)
+					response.messageObject.updateGroupData(g)
+					outboundMessage = OutboundMessage.OutboundMessage(response)
+					db.session.add(outboundMessage)
+					res, respStatus = response.send()
+				db.session.commit()
+			else:
+				res = "Group not found"
+				respStatus = 404
 		else:
 			res = "Malformed message"
 			respStatus = 404
-
-
-
-
-
 	return Response(res, status=respStatus, content_type='application/json')
 
 @app.route('/healthCheck', methods=['GET'])

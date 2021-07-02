@@ -31,6 +31,11 @@ class DefaultMessageType():
     def constructResponseText(self, payload, response):
         return ''
     
+    def updateGroupData(self, group):
+        group.group.counter_current += 1
+        
+        self.updateGroup()
+
     def updateGroup(self, group):
         #used by children to update the group's settings via message commands
         pass
