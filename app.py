@@ -105,9 +105,12 @@ def manageGroups(id = ''):
 				res = "Group created"
 				respStatus = 201
 			else:
-				g.botId = botId
-				g.groupName = groupName
-				g.messageTypes = payload.get('messageTypes', '{}')
+				if botId:
+					g.botId = botId
+				if groupName:
+					g.groupName = groupName
+				if payload.get('messageTypes'):
+					g.messageTypes = payload.get('messageTypes')
 				res = "Group updated"
 				respStatus = 201
 		else:

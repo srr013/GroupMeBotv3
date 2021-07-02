@@ -37,8 +37,7 @@ class Group(db.Model):
     # user_id = relationship("User", back_populates="groups")
 
 
-    def __init__(self, groupId, botId, groupName, identifier = ''):
-        self.id = identifier
+    def __init__(self, groupId, botId, groupName):
         self.groupId = groupId
         self.groupName = groupName
         self.botId = botId
