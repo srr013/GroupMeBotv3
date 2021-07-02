@@ -4,3 +4,4 @@ __pycache__/app.cpython-38.pyc
 __pycache__/settings.cpython-38.pyc
 test.py
 example_data/*
+migrations
