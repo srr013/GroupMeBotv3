@@ -1,7 +1,9 @@
-6.6 Review
+DO FIRST: Message counter is not resetting. --stop is not being respected 
+(a message is sent but service isn't stopped)
 
-Test - does it work with multiple groups?
-Migration files - can we setup the database automatically locally and in Heroku?
+DB issue - local vs prd DB gets out of synch.
+    Could have a setting 'usePrdDb'? But what am I trying to test with this?
+    Could just copy the DB down if need be?
 
 store responses to database via response.serialize
     -finish up the API calls with SQLAlchemy - GET and DELETE, POST should upsert

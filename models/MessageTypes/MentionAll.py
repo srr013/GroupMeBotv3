@@ -32,7 +32,7 @@ class MentionAll(Default.DefaultMessageType):
 
     def create_mention_text(self, response):
         msg = ""
-        for name in response.group.memberNicknames:
+        for name in response.groupMeGroup.memberNicknames:
             msg += "@"+name+", "
         msg = msg[0:-2]
         return msg

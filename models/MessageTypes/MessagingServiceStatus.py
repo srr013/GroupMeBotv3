@@ -8,5 +8,5 @@ class MessagingServiceStatus(Default.DefaultMessageType):
         self.responseType = 'text'
 
     def constructResponseText(self, payload, response):
-        s = 'On' if response.group.messagingServiceStatus else 'Off'
+        s = 'On' if response.groupMeGroup.messagingServiceStatus else 'Off'
         return "Bot service is: " + s

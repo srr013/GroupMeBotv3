@@ -1,5 +1,3 @@
-from sqlalchemy.sql.schema import ForeignKey
-import json
 from app import db
 import datetime
 from sqlalchemy.orm import relationship

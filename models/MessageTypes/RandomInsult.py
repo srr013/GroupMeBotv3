@@ -22,3 +22,7 @@ class RandomInsult(Default.DefaultMessageType):
             if " " not in m:
                 m+= " " + insults.insults[random.randint(0,len(insults.insults)-1)]
         return "@"+payload.get("name") + " is "+a+" "+ m
+
+    def updateGroup(self, group):
+        group.counter_current = 0
+        group.counter_currentThreshold = random.randint(group.counter_lowerBound, group.counter_upperBound)

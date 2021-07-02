@@ -5,6 +5,7 @@ import os
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
+from sqlalchemy.dialects.postgresql import ARRAY
 from app import db
 import services.config as config
 
@@ -15,7 +16,6 @@ import models.MessageTypes.RandomHouseDraw as RandomHouseDraw
 import models.MessageTypes.RandomInsult as RandomInsult
 import models.MessageTypes.StartMessagingService as StartMessagingService
 import models.MessageTypes.StopMessagingService as StopMessagingService
-
 import models.MessageTypes.messageTypes as systemMessageTypes
 
 class Group(db.Model):
@@ -31,11 +31,14 @@ class Group(db.Model):
     messageTypes = db.Column(JSON)
     active = db.Column(db.Boolean)
     messagingServiceStatus = db.Column(db.Boolean)
-
+    # creatingUser = db.Column(db.Integer)
+    # users = db.Column(ARRAY(db.Integer, ForeignKey('users.id')))
     bot = relationship("Bot", back_populates="groups")
+    # user_id = relationship("User", back_populates="groups")
 
 
-    def __init__(self, groupId, botId, groupName):
+    def __init__(self, groupId, botId, groupName, identifier = ''):
+        self.id = identifier
         self.groupId = groupId
         self.groupName = groupName
         self.botId = botId
@@ -78,7 +81,8 @@ class Group(db.Model):
         self.messageTypes = json.dumps(messageTypeList)
 
     def deserialize(self):
-        group = json.dumps({
+        group = {
+            "id": self.id,
             "Group Name": self.groupName,
             "Group ID": self.groupId,
             "Bot ID": self.botId,
@@ -86,5 +90,5 @@ class Group(db.Model):
             "Messaging Status": self.messagingServiceStatus,
             "Message Counter": str(self.counter_current) +"/"+ str(self.counter_currentThreshold),
             "Message Counter Bounds": str(self.counter_lowerBound) +"/"+ str(self.counter_upperBound)
-        })
+        }
         return group

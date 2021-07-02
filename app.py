@@ -1,11 +1,9 @@
 import os
 import json
-from flask import Flask, request, session, render_template
+from flask import Flask, request, session, render_template, Response
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 import logging
-import importlib
-import random
 import requests
 
 import settings
@@ -13,8 +11,10 @@ import services.config as config
 
 
 from services.GroupmeGroup import GroupmeGroup
-
 import services.InboundMessage as InboundMessage
+from services.Response import Response as MessageResponse
+
+
 
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
@@ -25,8 +25,9 @@ db = SQLAlchemy(app)
 
 #import after db is set
 from models.Group import Group
-from models.User import User
+# from models.User import User
 from models.Bot import Bot
+import models.OutboundMessage as OutboundMessage
 
 
 # Called whenever the app's callback URL receives a POST request
@@ -44,18 +45,34 @@ def webhook(groupId = ''):
 			g = db.session.query(Group).filter_by(groupId=groupId).first()
 			g.initializeGroupData()
 			group = GroupmeGroup(g)
-			res, respStatus = InboundMessage.parseMessage(request, group)
+			response = MessageResponse(group, payload)
+			response.messageObject = InboundMessage.parseMessageContent(payload, group, response)
+			if not response.messageObject:
+				if group.readyForMessage():
+					response.messageObject = response.getTriggeredResponse(group)
+			    #send the queued message
+			if response.messageObject:
+				response.responseText = response.messageObject.constructResponseText(payload, response)
+				response.messageObject.updateGroup(g)
+				outboundMessage = OutboundMessage.OutboundMessage(response)
+				db.session.add(outboundMessage)
+				res, respStatus = response.send()
 			db.session.commit()
 		else:
 			res = "Malformed message"
 			respStatus = 404
-	elif request.method == 'GET':
-		res = "Fuck yourself!"
-	return res, respStatus
+
+
+
+
+
+	return Response(res, status=respStatus, content_type='application/json')
 
 @app.route('/healthCheck', methods=['GET'])
 def healthCheck():
-	return "Fuck yourself!", 200
+	res = "Fuck yourself!"
+	respStatus = 200
+	return Response(res, status=respStatus, content_type='application/json')
 
 @app.route('/api/authorize', methods=['POST'])
 def validateToken():
@@ -85,30 +102,35 @@ def manageGroups(id = ''):
 				group = Group(groupId, botId, groupName)
 				group.createGroupData()
 				db.session.add(group)
-				db.session.commit()
-				return "Group created", 201
+				res = "Group created"
+				respStatus = 201
 			else:
 				g.botId = botId
 				g.groupName = groupName
 				g.messageTypes = payload.get('messageTypes', '{}')
-				db.session.commit()
-				return "Group updated", 201
+				res = "Group updated"
+				respStatus = 201
 		else:
-			return "Group not found. Request missing data or not formatted", 400
+			res = "Group not found. Request missing data or not formatted"
+			respStatus = 400
 	elif request.method == 'GET':
 		groupList = db.session.query(Group).all()
-		logging.warn(groupList)
-		return json.dumps([g.deserialize() for g in groupList]), 200
+		res = json.dumps({"groups":[g.deserialize() for g in groupList]})
+		respStatus = 200
 	elif request.method == 'DELETE':
 		if id:
 			g = db.session.query(Group).filter_by(groupId=id).first()
 			db.session.delete(g)
-			db.session.commit()
-			return "Group deleted", 200
+			res = "Group deleted"
+			respStatus = 200
 		else:
-			return "Group not found. Request missing data or not formatted", 400
+			res = "Group not found. Request missing data or not formatted"
+			respStatus = 400
 	else:
-		return "Method not allowed", 405
+		res = "Method not allowed"
+		respStatus = 405
+	db.session.commit()
+	return Response(res, status=respStatus, content_type='application/json')
 
 @app.route('/api/groupmegroups', methods=['GET'])
 def manageGroupMeGroups(id = ''):
@@ -116,17 +138,30 @@ def manageGroupMeGroups(id = ''):
 		url = "https://api.groupme.com/v3/groups?token="+config.GROUPME_ACCESS_TOKEN
 		groups = requests.get(url)
 		if groups:
-			return groups.text, 200
-		return "No groups found with provided access token", 400
+			res = groups.text
+			respStatus = 200
+		else:
+			res = "No groups found with provided access token"
+			respStatus = 400
+	else:
+		res = "Method not supported"
+		respStatus = 404
+	return Response(res, status=respStatus, content_type='application/json')
 
 @app.route('/api/bots', methods=['GET', 'POST'])
-@app.route('/api/bots/<id>', methods=['GET', 'DELETE'])
+@app.route('/api/bots/<id>', methods=['GET', 'DELETE', 'POST'])
 def manageBots(id = ''):
 	if request.method == 'POST':
 		payload = request.get_json()
 		groupId = str(payload.get('groupId'))
 		g = db.session.query(Group).filter_by(groupId=groupId).first()
-		if not g or groupId in config.TEST_GROUPS:
+		if g and payload.get("id"):
+			bot = Bot(payload["id"], payload["botName"], payload["botCallbackUrl"], payload["avatarUrl"])
+			g.botId = payload["id"]
+			db.session.add(bot)
+			res = "Bot created in DB and group updated! No GroupMe Action taken."
+			respStatus  = 201
+		elif not g or groupId in config.TEST_GROUPS:
 			botName = payload.get('botName')
 			botCallbackUrl = payload.get('botCallbackUrl')
 			avatarUrl = payload.get('avatarUrl')
@@ -154,23 +189,29 @@ def manageBots(id = ''):
 				group.createGroupData()
 				db.session.add(bot)
 				db.session.add(group)
-				db.session.commit()
-				return "Bot created!", 201
+				res = "Bot created!"
+				respStatus  = 201
 			else:
-				return f'Something happened: {res.content}', 400
+				res = f'Something happened: {res.content}'
+				respStatus = 400
 		else:
-			return f'Group {groupId} already has a bot assigned'
+			res = f'Group {groupId} already has a bot assigned. Use PUT to update'
+			respStatus = 200
 	elif request.method == 'DELETE' and id:
 		b = db.session.query(Bot).filter_by(id=id).first()
 		db.session.delete(b)
-		db.session.commit()
-		return "Bot deleted", 200
+		res = "Bot deleted"
+		respStatus = 200
 	elif request.method == 'GET':
 		if id:
 			botList = [db.session.query(Bot).filter_by(id=id).first()]
 		else:
 			botList = db.session.query(Bot).all()
 		logging.warn(botList)
-		return json.dumps([b.deserialize() for b in botList]), 200
+		res = json.dumps({"bots": [b.deserialize() for b in botList]})
+		respStatus = 200
 	else:
-		return "method not supported", 204
+		res = "Method not supported"
+		respStatus = 204
+	db.session.commit()
+	return Response(res, status=respStatus, content_type='application/json')

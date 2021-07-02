@@ -28,45 +28,25 @@ import models.MessageTypes.StopMessagingService as StopMessagingService
 # for messageType in messageModuleList:
 #     messageObjectList.append(eval("%s.%s()" % (messageType, messageType)))
 
-def parseMessage(request, group):
+def parseMessageContent(payload, group, response):
     messageModuleList = []
-    logging.warn("Request: "+json.dumps(request.get_json()))
-    payload = request.get_json()
     inboundMessage = payload.get('text')
-    response = Response.Response(group, payload)
+
     if validateGroupmePost(payload):
         group.group.counter_current += 1
         #create the message type modules and 
         #check if inbound text meets any qualifyingText parameters
         group.messageObjects = group.group.getMessageObjects()
+
         for m in group.messageObjects:
             #check for a command and process only the first command
             if m.qualifyText(inboundMessage):
-                response.messageObject = m
-        if not response.messageObject:
-        #No commands were provided, checking for random message
-        #assign each module that has a qualifying percent a number range
-            if group.readyForMessage():
-                for m in group.messageObjects:
-                    #set the random selection range for each message type
-                    randUpperBound = m.getRandBoundary(0)
-                #select the random #
-                selector = random.randint(0, randUpperBound)
-                for m in group.messageObjects:
-                    #if the selected number falls within random selection range
-                    if m.randLowerBound <= selector <= m.randUpperBound:
-                        response.messageObject = m
+                return m
+    return {}
 
-        #send the queued message
-        if response.messageObject:
-            responseText = response.messageObject.constructResponseText(payload, response)
-            response.messageObject.updateGroup(group)
-            res, respStatus = response.send(responseText)
-    else:
-        res = "Group not found"
 
-        respStatus = 404
-    return res, respStatus
+
+
 
 
 def validateGroupmePost(payload, allowBot=False):

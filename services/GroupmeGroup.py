@@ -23,6 +23,9 @@ class GroupmeGroup():
             logging.error("Group creation failed: Could not retrieve or parse GroupMe API data")
         self.messageObjects = []
 
+    def __repr__(self):
+        return '<id {}>'.format(self.group.id)
+
     def getRawData(self):
         url = "https://api.groupme.com/v3/groups/" + self.group.groupId + "?token="+config.GROUPME_ACCESS_TOKEN
         response = requests.get(url)
