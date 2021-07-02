@@ -33,7 +33,7 @@ class DefaultMessageType():
     
     def updateGroupData(self, group):
         group.counter_current += 1
-        self.updateGroup()
+        self.updateGroup(group)
 
     def updateGroup(self, group):
         #used by children to update the group's settings via message commands
