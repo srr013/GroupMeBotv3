@@ -32,8 +32,7 @@ class DefaultMessageType():
         return ''
     
     def updateGroupData(self, group):
-        group.group.counter_current += 1
-        
+        group.counter_current += 1
         self.updateGroup()
 
     def updateGroup(self, group):
