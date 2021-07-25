@@ -1,12 +1,13 @@
 import random
 
 class DefaultMessageType():
-    def __init__(self):
+    def __init__(self, group):
         self.qualifyingText = []
         self.qualifyingPercent = 0 #number from 1 - 100
         self.responseType = 'text'
         self.responseText = ''
         self.isQualified = False
+        self.group = group
         # self.response = response
         # self.inboundPayload = payload
         # self.inboundMessage = payload.get("text")
@@ -18,6 +19,7 @@ class DefaultMessageType():
             "name": self.__class__.__name__,
             "active": True
         }
+        self.helpText = ''
     
     def qualifyText(self, inboundMessage):
         if self.qualifyingText:
@@ -31,18 +33,16 @@ class DefaultMessageType():
     def constructResponseText(self, payload, response):
         return ''
     
-    def updateGroupData(self, group):
-        group.counter_current += 1
-        self.updateGroup(group)
+    def updateGroupData(self):
+        if self.group.messagingServiceStatus:
+            self.group.counter_current += 1
+        self.updateGroup()
 
-    def updateGroup(self, group):
+    def updateGroup(self):
         #used by children to update the group's settings via message commands
         pass
 
     def getRandBoundary(self, randUpperBound):
-        if self.qualifyingPercent > 0:
-            self.randLowerBound = randUpperBound
-            self.randUpperBound = self.randLowerBound + self.qualifyingPercent
-            return self.randUpperBound
-        #return the argument if not eligible
-        return randUpperBound
+        self.randLowerBound = randUpperBound
+        self.randUpperBound = randUpperBound + self.qualifyingPercent
+        return self.randUpperBound

@@ -47,10 +47,11 @@ def webhook(groupId = ''):
 				g.initializeGroupData()
 				group = GroupmeGroup(g)
 				response = MessageResponse(group, payload)
-
+				bot = db.session.query(Bot).filter_by(id=g.botId).first()
+				group.bot = bot
 				#set the messageObject to send the message from that object
 				#check for written triggers
-				response.messageObject = InboundMessage.parseMessageContent(payload, group, response)
+				response.messageObject = InboundMessage.parseMessageContent(payload, group, response, bot)
 				#check for random content
 				if not response.messageObject:
 					if group.readyForMessage():
@@ -59,7 +60,7 @@ def webhook(groupId = ''):
 				#send the queued message
 				if response.messageObject:
 					response.responseText = response.messageObject.constructResponseText(payload, response)
-					response.messageObject.updateGroupData(g)
+					response.messageObject.updateGroupData()
 					outboundMessage = OutboundMessage.OutboundMessage(response)
 					db.session.add(outboundMessage)
 					res, respStatus = response.send()

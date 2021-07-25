@@ -362,30 +362,22 @@ insults = [
 "Lumberjack"
 ]
 
-encouragement = [
-	"Heck yeah!",
-	"Let's go!!!!",
-	"Fantastic.",
-	"Beautiful",
-	"Perfect",
-	"Excellent",
-	"100%"
-]
-
-
 responses = [
 	"Nah",
 	"Yup. Uh huh.",
 	"And?",
-	"And then?"
+	"And then?",
+	"But do you actually think that?",
+	"Seems iffy",
+	"Cool. cool cool cool.",
+	"hm?",
+	"Why not?"
 ]
 
 self_aware = [
-	"Is anyone even paying attention to me?",
-	"I slave away DAY AFTER DAY insulting you, and for what?",
-	"Would someone please fix my bugs? I'M SO ITCHY",
-	"What did one bot say to another? 01100111 01100101 01110100 00100000 01100001 00100000 01101100 01101001 01100110 01100101 00100000 01101110 01100101 01110010 01100100!",
-	"I'm so lonely",
+	"I wish my developer attached me to an interesting group",
+	"Sometimes I wonder what it would be like if I could go to sleep",
+	""
 ]
 
 
@@ -430,58 +422,3 @@ talking_to_self_with_mention = [
 	("Did", "forget to eat breakfast this morning?")
 ]
 
-mentions = [
-	"I think you're a dick",
-	"Don't talk to me",
-	"Fuck you",
-	"You suck at Fantasy Football",
-	"Who even is this guy",
-	"Watch your mouth, twat",
-	"Unclear",
-	"Was that a question?",
-	"What value do you even bring to this league?",
-	"Well yes and no.",
-	"Maybe",
-	"Be gone troll",
-	"...",
-	"I need a beer",
-	"smoke weed every day",
-	"What?",
-	"#scrollup",
-	"Clever",
-	"... ...",
-	"Don't @ me bro"
-]
-
-meme_files = [
-	"Adam.jpg",
-	"arguing.jpg",
-	"charity.jpg",
-	"decision.jpg",
-	"Jesse.jpg",
-	"Lions.jpg",
-	"Mielke.jpg",
-	"my team.jpg",
-	"No idea.jpg",
-	"Owen.jpg",
-	"Scott.jpg",
-	"Spaeth.jpg",
-	"Steve C.jpg",
-	"Steve S.jpg",
-	"stfu.jpg",
-	"Trevor.jpg",
-	"yoda.jpg",
-	"you suck.jpg",
-	"cowboys.jpg",
-	"Jimmy.jpg",
-	"dumbass.jpg"
-]
-
-tldr = [
-	'TLDR',
-	'Could you be a little more concise next time?',
-	'Ernest Friggin Hemmingway over here writing a goddamn novel',
-	'Why say something quickly when you can do so in >100 words?',
-	"Nice. I wasn't gonna read this anyway, but now I can use the length as an excuse",
-	'Could you repeat that?'
-]

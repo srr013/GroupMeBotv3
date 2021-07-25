@@ -3,10 +3,13 @@ import random
 import logging
 
 class RandomHouseDraw(Default.DefaultMessageType):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, group):
+        super().__init__(group)
         self.qualifyingText = ['randomhouses']
         self.responseType = 'text'
+        self.helpText = """
+--randomhouses <gamename> <userlist:comma-delimited>: Supported games: RTKL, NKFD, RITS, SITN, 3p. If the game size does not match the number of groupme members then you must specify the members to include. Don't include spaces in the message except between parameters. Player names should be separated by commas. ex: --randomhouses 3p paul,ringo,john
+"""
     
     def constructResponseText(self, payload, response):
         responseText = ''
@@ -14,7 +17,7 @@ class RandomHouseDraw(Default.DefaultMessageType):
         command = inboundMessage.split(" ")
         houseList = self.getHouseList(command[1])
         random.shuffle(houseList)
-        names = response.group.memberNames.copy()
+        names = response.groupMeGroup.memberNames.copy()
         if len(command) > 2:
             names = command[2].split(",")
         random.shuffle(names)

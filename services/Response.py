@@ -2,6 +2,9 @@ import requests
 import logging
 import random
 import json
+import os
+import services.config as config
+
 
 class Response():
     def __init__(self, group, payload):
@@ -16,15 +19,20 @@ class Response():
     def getTriggeredResponse(self, group):
         #No commands were provided, checking for random message
         #assign each module that has a qualifying percent a number range
+        messageObjects = []
+        randUpperBound = 0
         for m in group.messageObjects:
             #set the random selection range for each message type
-            randUpperBound = m.getRandBoundary(0)
+            if m.messageCategory == 'random':
+                messageObjects.append(m)
+                randUpperBound += m.getRandBoundary(randUpperBound)
         #select the random #
-        selector = random.randint(0, randUpperBound)
-        for m in group.messageObjects:
-            #if the selected number falls within random selection range
-            if m.randLowerBound <= selector <= m.randUpperBound:
-                return m
+        if randUpperBound > 0:
+            selector = random.randint(0, randUpperBound)
+            for m in messageObjects:
+                #if the selected number falls within random selection range
+                if m.randLowerBound <= selector <= m.randUpperBound:
+                    return m
 
     def send(self):
         statusCode = 0
@@ -45,6 +53,14 @@ class Response():
                 body = {
                     'bot_id': self.groupMeGroup.group.botId,
                     'text': self.responseText
+                }
+            #Send a message with an image attached in the groupchat
+            elif self.messageObject.responseType == 'image':
+                urlOnGroupMeService = self.upload_image_to_groupme(self.responseText)
+                body = {
+                    'bot_id'		: self.groupMeGroup.group.botId,
+                    'text'			: '',
+                    'picture_url'		: urlOnGroupMeService['payload']['url']
                 }
             if self.inboundMessagePayload.get("sendMessage", True):
                 resp = requests.post(url, json=body)
@@ -71,3 +87,13 @@ class Response():
                 #logging.warning("Loci are: " + start +" " +end])
                 loci.append([start, end])
         return loci
+    
+    #Uploads image to GroupMe's services and returns the new URL
+    def upload_image_to_groupme(self, filename):
+        headers = {'Content-Type': 'image/jpeg',
+                    'X-Access-Token': config.GROUPME_ACCESS_TOKEN}
+        url = 'https://image.groupme.com/pictures'
+        data = open(filename, 'rb').read()
+        r = requests.post(url, headers=headers, data=data)
+        imageurl = json.loads(r.text)
+        return imageurl

@@ -28,7 +28,7 @@ import models.MessageTypes.StopMessagingService as StopMessagingService
 # for messageType in messageModuleList:
 #     messageObjectList.append(eval("%s.%s()" % (messageType, messageType)))
 
-def parseMessageContent(payload, group, response):
+def parseMessageContent(payload, group, response, bot):
     messageModuleList = []
     inboundMessage = payload.get('text')
 

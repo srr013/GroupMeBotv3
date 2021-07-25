@@ -2,10 +2,11 @@ import models.MessageTypes._DefaultMessageType as Default
 import logging
 
 class MentionAll(Default.DefaultMessageType):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, group):
+        super().__init__(group)
         self.qualifyingText = ['@all']
         self.responseType = 'mention'
+        self.helpText = "@all: tag all users in the GroupMe"
 
     def qualifyText(self, inboundMessage):
         if self.qualifyingText:

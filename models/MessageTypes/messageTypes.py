@@ -5,5 +5,10 @@ types = [
     "MessagingServiceStatus", 
     "RandomHouseDraw", 
     "MentionAll", 
-    "RandomInsult"
+    "RandomInsult",
+    "RandomEncouragement",
+    "RandomImage",
+    "TalkingToBot",
+    "TLDR"
     ]
+#You must also add these modules into Group.py

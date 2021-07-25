@@ -9,7 +9,7 @@ class GroupmeGroup():
     def __init__(self, group):
         self.group = group
         self.rawData = self.getRawData()
-
+        self.bot = {}
         if self.rawData:
             self.data = json.loads(self.rawData.text)
             if self.data.get("response"):

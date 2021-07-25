@@ -17,6 +17,10 @@ import models.MessageTypes.RandomHouseDraw as RandomHouseDraw
 import models.MessageTypes.RandomInsult as RandomInsult
 import models.MessageTypes.StartMessagingService as StartMessagingService
 import models.MessageTypes.StopMessagingService as StopMessagingService
+import models.MessageTypes.RandomEncouragement as RandomEncouragement
+import models.MessageTypes.RandomImage as RandomImage
+import models.MessageTypes.TalkingToBot as TalkingToBot
+import models.MessageTypes.TLDR as TLDR
 import models.MessageTypes.messageTypes as systemMessageTypes
 
 class Group(db.Model):
@@ -69,10 +73,11 @@ class Group(db.Model):
     def getMessageObjects(self):
         messageObjectList = []
         for messageType in systemMessageTypes.types:
-            module = eval("%s.%s()" % (messageType, messageType))
+            module = eval("%s.%s(self)" % (messageType, messageType))
             for mType in self.messageTypes:
                 if mType.get('name') == module.__class__.__name__ and mType.get('active'):
                     messageObjectList.append(module)
+        self.messageObjectList = messageObjectList
         return messageObjectList
 
 

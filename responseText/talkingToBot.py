@@ -1,0 +1,22 @@
+talkingToBot = [
+	"I think you're a dick",
+	"Don't talk to me",
+	"Fuck you",
+	"You suck at Fantasy Football",
+	"Who even is this guy",
+	"Watch your mouth, twat",
+	"Unclear",
+	"Was that a question?",
+	"What value do you even bring to this league?",
+	"Well yes and no.",
+	"Maybe",
+	"Be gone troll",
+	"...",
+	"I need a beer",
+	"smoke weed every day",
+	"What?",
+	"#scrollup",
+	"Clever",
+	"... ...",
+	"Don't @ me bro"
+]

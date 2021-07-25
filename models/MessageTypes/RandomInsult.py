@@ -4,12 +4,13 @@ import random
 import responseText.insults as insults
 
 class RandomInsult(Default.DefaultMessageType):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, group):
+        super().__init__(group)
         self.qualifyingText =['insult']
         self.qualifyingPercent = 100
         self.responseType = 'mention'
         self.messageCategory = 'random'
+        self.helpText = '--insult: bot will send a random insult about you'
 
     def constructResponseText(self, payload, response):
         m = insults.insults[random.randint(0,len(insults.insults)-1)]
@@ -23,7 +24,7 @@ class RandomInsult(Default.DefaultMessageType):
                 m+= " " + insults.insults[random.randint(0,len(insults.insults)-1)]
         return "@"+payload.get("name") + " is "+a+" "+ m
 
-    def updateGroup(self, group):
-        group.counter_current = 0
-        group.counter_currentThreshold = random.randint(group.counter_lowerBound, group.counter_upperBound)
+    def updateGroup(self):
+        self.group.counter_current = 0
+        self.group.counter_currentThreshold = random.randint(self.group.counter_lowerBound, self.group.counter_upperBound)
         return

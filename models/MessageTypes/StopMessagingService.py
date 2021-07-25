@@ -2,12 +2,13 @@ import models.MessageTypes._DefaultMessageType as Default
 import logging
 
 class StopMessagingService(Default.DefaultMessageType):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, group):
+        super().__init__(group)
         self.qualifyingText = ['stop']
         self.responseType = 'text'
         self.responseText = ''
         self.isQualified = False
+        self.helpText = "--start: start the messaging service, which allows Bot to send messages. Bot will always respond to --commands."
 
     def constructResponseText(self, payload, response):
         responseText = """
@@ -15,5 +16,5 @@ class StopMessagingService(Default.DefaultMessageType):
         """
         return responseText
 
-    def updateGroup(self, group):
-        group.messagingServiceStatus = False
+    def updateGroup(self):
+        self.group.messagingServiceStatus = False
