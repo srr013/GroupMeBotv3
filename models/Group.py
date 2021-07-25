@@ -80,7 +80,6 @@ class Group(db.Model):
         self.messageObjectList = messageObjectList
         return messageObjectList
 
-
     def setMessageTypes(self):
         messageTypeList = []
         for messageType in systemMessageTypes.types:

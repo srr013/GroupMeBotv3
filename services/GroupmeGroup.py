@@ -76,4 +76,6 @@ class GroupmeGroup():
                 return True
         return False
 
-
+    def incrementCounter(self):
+        if self.group.messagingServiceStatus:
+            self.group.counter_current += 1

@@ -34,8 +34,6 @@ class DefaultMessageType():
         return ''
     
     def updateGroupData(self):
-        if self.group.messagingServiceStatus:
-            self.group.counter_current += 1
         self.updateGroup()
 
     def updateGroup(self):

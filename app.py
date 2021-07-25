@@ -46,6 +46,7 @@ def webhook(groupId = ''):
 			if g:
 				g.initializeGroupData()
 				group = GroupmeGroup(g)
+				group.incrementCounter()
 				response = MessageResponse(group, payload)
 				bot = db.session.query(Bot).filter_by(id=g.botId).first()
 				group.bot = bot
@@ -116,6 +117,10 @@ def manageGroups(id = ''):
 					g.groupName = groupName
 				if payload.get('messageTypes'):
 					g.messageTypes = payload.get('messageTypes')
+				if 'messagingServiceStatus' in payload.keys():
+					g.messagingServiceStatus = payload.get('messagingServiceStatus')
+				if 'active' in payload.keys():
+					g.active = payload.get('active')
 				res = "Group updated"
 				respStatus = 201
 		else:
