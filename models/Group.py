@@ -83,7 +83,7 @@ class Group(db.Model):
     def setMessageTypes(self):
         messageTypeList = []
         for messageType in systemMessageTypes.types:
-            module = eval("%s.%s()" % (messageType, messageType))
+            module = eval("%s.%s(self)" % (messageType, messageType))
             messageTypeList.append(module.typeDefinition)
         self.messageTypes = json.dumps(messageTypeList)
 
