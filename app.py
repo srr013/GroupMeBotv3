@@ -46,7 +46,8 @@ def webhook(groupId = ''):
 			if g:
 				g.initializeGroupData()
 				group = GroupmeGroup(g)
-				group.incrementCounter()
+				if not InboundMessage.isBotOrSystemMessage:
+					group.incrementCounter()
 				response = MessageResponse(group, payload)
 				bot = db.session.query(Bot).filter_by(id=g.botId).first()
 				group.bot = bot
@@ -72,7 +73,11 @@ def webhook(groupId = ''):
 		else:
 			res = "Malformed message"
 			respStatus = 404
-	return Response(res, status=respStatus, content_type='application/json')
+		return Response(res, status=respStatus, content_type='application/json')
+	# if request.method == 'GET':
+	# 	return render_template('home.html')
+
+
 
 @app.route('/healthCheck', methods=['GET'])
 def healthCheck():
@@ -113,7 +118,7 @@ def manageGroups(id = ''):
 			else:
 				if botId:
 					g.botId = botId
-				if groupName:
+				if groupName != 'default':
 					g.groupName = groupName
 				if payload.get('messageTypes'):
 					g.messageTypes = payload.get('messageTypes')
