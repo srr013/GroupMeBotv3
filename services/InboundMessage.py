@@ -64,3 +64,8 @@ def validateGroupmePost(payload, allowBot=False):
                         and payload.get("source_guid"):
             isValid = True
     return isValid
+
+def isBotOrSystemMessage(payload):
+    if payload.get('sender_type') in ["bot", "system"]:
+        return True
+    return False
