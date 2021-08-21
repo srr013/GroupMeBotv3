@@ -37,15 +37,18 @@ def getFileObjsFromBucket(bucket, filename=''):
             if image.get('Key') == filename:
                 return [image]
     elif bucket.get('Contents'):
-        bucket.get('Contents')
-    else:
-        return []
+        return bucket.get('Contents')
+    return []
 
 def downloadFileFromBucket(bucket, fileObject):
     fn = fileObject.get('Key')
     fp = os.path.join("temp",fn)
-    with open(fp, 'wb') as o:
-        s3.download_fileobj(bucket.get('Name'), fn, o)
+    if bucket.get('Name'):
+        try:
+            with open(fp, 'wb') as o:
+                s3.download_fileobj(bucket.get('Name'), fn, o)
+        except Exception as e:
+            logging.error("No object of name: {} found in bucket")
     return fp
 
 def putFileInBucket(fileName, bucket):

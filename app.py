@@ -84,6 +84,7 @@ def webhook(groupId = ''):
 @app.route('/api/sendMessage/<groupId>', methods=['POST'])
 def sendMessage(groupId = ''):
 	res = "No groupId provided"
+	respStatus = 204
 	payload = request.get_json()
 	if groupId:
 		if groupId:
@@ -96,16 +97,23 @@ def sendMessage(groupId = ''):
 				group.bot = bot
 				response.messageObject = SendMessageFromAPI.SendMessageFromAPI(group)
 				if payload.get('isImage'):
-					response.messageObject.responseType = 'image'
 					bucket = AWS.getBucket('insultbot-memes')
 					fileObjs = AWS.getFileObjsFromBucket(bucket, payload.get("imageName"))
-					response.responseText = AWS.downloadFileFromBucket(bucket, fileObjs[0])
+					if fileObjs:
+						response.messageObject.responseType = 'image'
+						response.responseText = AWS.downloadFileFromBucket(bucket, fileObjs[0])
+					else:
+						response.responseText = None
 				else:
-					response.messageObject.responseType = 'text'
-					response.responseText = payload.get('message')
-				outboundMessage = OutboundMessage.OutboundMessage(response)
-				db.session.add(outboundMessage)
-				res, respStatus = response.send()
+					if payload.get('message'):
+						response.messageObject.responseType = 'text'
+						response.responseText = payload.get('message')
+					else:
+						response.responseText = None
+				if response.responseText:
+					outboundMessage = OutboundMessage.OutboundMessage(response)
+					db.session.add(outboundMessage)
+					res, respStatus = response.send()
 	return Response(res, status=respStatus, content_type='application/json')
 
 @app.route('/healthCheck', methods=['GET'])
