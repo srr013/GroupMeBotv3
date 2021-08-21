@@ -12,6 +12,10 @@ s3 = boto3.client(
     aws_secret_access_key=config.AWS_S3_USER_SECRET
 )
 
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in config.ALLOWED_EXTENSIONS
+
 def getBucket(bucketName):
     return s3.list_objects(Bucket=bucketName)
 
@@ -53,11 +57,11 @@ def downloadFileFromBucket(bucket, fileObject):
 
 def putFileInBucket(fileName, bucket):
     try:
-        s3.upload_file(os.path.join("static","images", fileName), bucket, fileName)
+        result = s3.upload_file(os.path.join("temp", fileName), bucket, fileName)
     except Exception as e:
         logging.error(f'File upload failed with error: {e}')
-        return f"Error uploading file {fileName}", 404
-    return f"{fileName} uploaded successfully", 200
+        return f"Error uploading file: {fileName}", 404
+    return f"{fileName} uploaded successfully or already present", 200
 
 def deleteFileInBucket(fileName, bucketName):
     bucket = getBucket(bucketName)

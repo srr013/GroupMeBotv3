@@ -10,7 +10,7 @@ class Response():
     def __init__(self, group, payload):
         self.messageObject = ''
         self.groupMeGroup = group
-        self.inboundMessagePayload = payload
+        self.inboundMessagePayload = payload #payload may be empty
         self.sendMessage = payload.get("sendMessage", True)
         self.messageObject = {}
         self.responseText = "No content set"

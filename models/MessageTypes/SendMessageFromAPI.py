@@ -11,3 +11,4 @@ class SendMessageFromAPI(Default.DefaultMessageType):
     def constructResponseText(self, payload, response):
         return payload.get('message')
 
+

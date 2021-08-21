@@ -1,0 +1,36 @@
+{# templates/index.html #}
+
+{% extends "layout.html" %}
+
+{% block body %}
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="page-header">
+            InsultBot Image Uploader <small>Get your meme to the masses</small>
+        </h1>
+    </div>
+    <div class="col-md-12">
+        <div id="app">
+            <div class="upload">
+                <form name="imageUploadForm" id="upload-form" action="" method="post" enctype="multipart/form-data">
+                    <input type=file name=file>
+                </form>
+                <button onclick="submitForm()">Submit</button>
+                <p id="imageUploadForm-uploadStatus" class="status-text"></p>
+            </div>
+            <div class="image-list">
+                <p>List of current memes:</p>
+                <p>(Reload page to see recent upload)</p>
+                <ul>
+                {% for image in imageList %}
+                    <li>{{ image }}</li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div> 
+    <!-- /. ROW  -->
+    <footer><p>Have a terrible fucking day!</p></footer>
+</div>
+{% endblock %}

@@ -5,7 +5,7 @@ from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 import logging
 import requests
-
+from werkzeug.utils import secure_filename
 
 import settings
 import services.config as config
@@ -25,6 +25,7 @@ CORS(app, resources={r"/api/*": {"origins": "*"}})
 app.secret_key = os.environ.get('SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['UPLOAD_FOLDER'] = config.UPLOAD_FOLDER
 db = SQLAlchemy(app)
 
 #import after db is set
@@ -79,7 +80,9 @@ def webhook(groupId = ''):
 			respStatus = 404
 		return Response(res, status=respStatus, content_type='application/json')
 	if request.method == 'GET':
-		return render_template('index.html')
+		images, status = AWS.getBucketContents(config.BUCKET_NAME)
+		images = json.loads(images)
+		return render_template('index.html', imageList = images)
 
 @app.route('/api/sendMessage/<groupId>', methods=['POST'])
 def sendMessage(groupId = ''):
@@ -284,8 +287,24 @@ def manageBuckets(bucketName = ''):
 		res, status = AWS.getBucketContents(bucketName)
 		return Response(res, status=status, content_type='application/json')
 	elif request.method == 'POST':
-		res, status =  AWS.putFileInBucket(filename, bucketName)
-		return Response(res, status=status, content_type='application/json')
+		res = 'No file provided'
+		respStatus = 404
+		if filename or 'file' in request.files:
+			if filename:
+				res, status =  AWS.putFileInBucket(filename, bucketName)
+			else:
+				file = request.files['file']
+        # If the user does not select a file, the browser submits an
+        # empty file without a filename.
+				if file.filename:
+					if AWS.allowed_file(file.filename):
+						filename = secure_filename(file.filename)
+						file.save(os.path.join(config.UPLOAD_FOLDER, filename))
+					else:
+						res = f"File extension not in allowed list: {config.ALLOWED_EXTENSIONS}"
+			if filename:
+				res, respStatus =  AWS.putFileInBucket(filename, bucketName)
+		return Response(json.dumps({"text": res}), status=respStatus, content_type='application/json')
 	elif request.method == 'DELETE':
 		res, status =  AWS.deleteFileInBucket(filename, bucketName)
 		return Response(res, status=status, content_type='application/json')
