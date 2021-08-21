@@ -11,3 +11,4 @@ Flask-Cors==3.0.9
 Flask-Login==0.5.0
 GroupyAPI==0.10.3
 yahoo-oauth==0.1.9
+boto3
