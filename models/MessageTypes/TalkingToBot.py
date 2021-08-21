@@ -7,7 +7,7 @@ class TalkingToBot(Default.DefaultMessageType):
     def __init__(self, group):
         super().__init__(group)
         self.qualifyingText =['talkingToBot']
-        self.responseType = 'command'
+        self.responseType = 'text'
         self.helpText = "--talkingToBot: trigger a response from the bot based on a mention of Bot's name"
         
     def qualifyText(self, inboundMessage):

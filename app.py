@@ -6,6 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 import logging
 import requests
 
+
 import settings
 import services.config as config
 
@@ -13,6 +14,9 @@ import services.config as config
 from services.GroupmeGroup import GroupmeGroup
 import services.InboundMessage as InboundMessage
 from services.Response import Response as MessageResponse
+import services.aws as AWS
+
+import models.MessageTypes.SendMessageFromAPI as SendMessageFromAPI
 
 
 
@@ -46,7 +50,7 @@ def webhook(groupId = ''):
 			if g:
 				g.initializeGroupData()
 				group = GroupmeGroup(g)
-				if not InboundMessage.isBotOrSystemMessage:
+				if not InboundMessage.isBotOrSystemMessage(payload):
 					group.incrementCounter()
 				response = MessageResponse(group, payload)
 				bot = db.session.query(Bot).filter_by(id=g.botId).first()
@@ -74,10 +78,35 @@ def webhook(groupId = ''):
 			res = "Malformed message"
 			respStatus = 404
 		return Response(res, status=respStatus, content_type='application/json')
-	# if request.method == 'GET':
-	# 	return render_template('home.html')
+	if request.method == 'GET':
+		return render_template('index.html')
 
-
+@app.route('/api/sendMessage/<groupId>', methods=['POST'])
+def sendMessage(groupId = ''):
+	res = "No groupId provided"
+	payload = request.get_json()
+	if groupId:
+		if groupId:
+			g = db.session.query(Group).filter_by(groupId=groupId).first()
+			if g:
+				g.initializeGroupData()
+				group = GroupmeGroup(g)
+				response = MessageResponse(group, payload)
+				bot = db.session.query(Bot).filter_by(id=g.botId).first()
+				group.bot = bot
+				response.messageObject = SendMessageFromAPI.SendMessageFromAPI(group)
+				if payload.get('isImage'):
+					response.messageObject.responseType = 'image'
+					bucket = AWS.getBucket('insultbot-memes')
+					fileObjs = AWS.getFileObjsFromBucket(bucket, payload.get("imageName"))
+					response.responseText = AWS.downloadFileFromBucket(bucket, fileObjs[0])
+				else:
+					response.messageObject.responseType = 'text'
+					response.responseText = payload.get('message')
+				outboundMessage = OutboundMessage.OutboundMessage(response)
+				db.session.add(outboundMessage)
+				res, respStatus = response.send()
+	return Response(res, status=respStatus, content_type='application/json')
 
 @app.route('/healthCheck', methods=['GET'])
 def healthCheck():
@@ -233,3 +262,23 @@ def manageBots(id = ''):
 		respStatus = 204
 	db.session.commit()
 	return Response(res, status=respStatus, content_type='application/json')
+
+@app.route('/api/buckets', methods=['GET', 'POST', 'DELETE', 'PUT'])
+@app.route('/api/buckets/<bucketName>', methods=['GET', 'DELETE', 'PUT'])
+def manageBuckets(bucketName = ''):
+	if not bucketName:
+		bucketName = config.BUCKET_NAME
+	filename = ''
+	if request.args.get("filename"):
+		filename = request.args.get("filename")
+
+	if request.method == 'GET':
+		res, status = AWS.getBucketContents(bucketName)
+		return Response(res, status=status, content_type='application/json')
+	elif request.method == 'POST':
+		res, status =  AWS.putFileInBucket(filename, bucketName)
+		return Response(res, status=status, content_type='application/json')
+	elif request.method == 'DELETE':
+		res, status =  AWS.deleteFileInBucket(filename, bucketName)
+		return Response(res, status=status, content_type='application/json')
+		
