@@ -2,7 +2,7 @@ function submitForm (){
     let form = document.getElementById('upload-form')
     var formData = new FormData(form);
     $.ajax({
-        url: 'https://https://gottbg-monitor.herokuapp.com/api/buckets',
+        url: window.location.origin + '/api/buckets',
         type: 'POST',
         data: formData,
         async: true,
