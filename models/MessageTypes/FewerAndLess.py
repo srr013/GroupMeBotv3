@@ -16,7 +16,7 @@ class FewerAndLess(Default.DefaultMessageType):
 
     def constructResponseText(self, payload, response):
         msg = '*fewer'
-        if ' fewer ' in payload.get('message'):
+        if ' fewer ' in payload.get('text'):
             return '*less'
         return msg
 
