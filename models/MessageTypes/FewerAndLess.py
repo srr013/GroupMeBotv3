@@ -6,6 +6,7 @@ class FewerAndLess(Default.DefaultMessageType):
         super().__init__(group)
         self.qualifyingText = [' fewer ', ' less ']
         self.responseType = 'text'
+        self.messageCategory = "command"
 
     def qualifyText(self, inboundMessage):
         if self.qualifyingText:
