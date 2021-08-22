@@ -14,6 +14,10 @@ class TalkingToBot(Default.DefaultMessageType):
         if self.group.bot:
             if self.group.bot.botName.lower() in inboundMessage.lower():
                 return True
+            if 'insultbot' in inboundMessage.lower():
+                return True
+            if 'insult bot' in inboundMessage.lower():
+                return True
         if self.qualifyingText:
             for m in self.qualifyingText:
                 m = m.lower()
