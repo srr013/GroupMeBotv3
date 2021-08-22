@@ -9,6 +9,7 @@ types = [
     "RandomEncouragement",
     "RandomImage",
     "TalkingToBot",
-    "TLDR"
+    "TLDR",
+    "FewerAndLess"
     ]
 #You must also add these modules into Group.py
