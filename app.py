@@ -1,6 +1,7 @@
 import os
 import json
 from flask import Flask, request, session, render_template, Response
+from flask.helpers import send_file
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 import logging
@@ -285,7 +286,7 @@ def manageBuckets(bucketName = ''):
 
 	if request.method == 'GET':
 		res, status = AWS.getBucketContents(bucketName)
-		return Response(res, status=status, content_type='application/json')
+		return Response(json.dumps({"text": res}), status=status, content_type='application/json')
 	elif request.method == 'POST':
 		res = 'No file provided'
 		respStatus = 404
@@ -307,5 +308,14 @@ def manageBuckets(bucketName = ''):
 		return Response(json.dumps({"text": res}), status=respStatus, content_type='application/json')
 	elif request.method == 'DELETE':
 		res, status =  AWS.deleteFileInBucket(filename, bucketName)
-		return Response(res, status=status, content_type='application/json')
+		return Response(json.dumps({"text": res}), status=status, content_type='application/json')
 		
+@app.route('/api/images/<imageName>', methods=['GET'])
+def manageImages(imageName = ''):
+	res = f"Image not found: {imageName}"
+	respStatus = 404
+	bucket = AWS.getBucket(config.BUCKET_NAME)
+	fileObjs = AWS.getFileObjsFromBucket(bucket, imageName)
+	if request.method == 'GET':
+		res = AWS.downloadFileFromBucket(bucket, fileObjs[0])
+		return send_file(res, mimetype='image/jpeg')

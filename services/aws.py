@@ -40,6 +40,10 @@ def getFileObjsFromBucket(bucket, filename=''):
         for image in bucket.get('Contents'):
             if image.get('Key') == filename:
                 return [image]
+        #send the default image if a filename is specified and not found
+        for image in bucket.get('Contents'):
+            if image.get('Key') == config.DEFAULT_IMAGE_NAME:
+                return [image]
     elif bucket.get('Contents'):
         return bucket.get('Contents')
     return []

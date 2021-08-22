@@ -23,7 +23,10 @@
                 <p>(Reload page to see recent upload)</p>
                 <ul>
                 {% for image in imageList %}
-                    <li>{{ image }}</li>
+                    <li>
+                        <a href="/api/images/{{image}}">{{ image }}</a>
+                        <button onclick="deleteImage(this)" data-image={{image}}>Delete</button>
+                    </li>
                 {% endfor %}
                 </ul>
             </div>
