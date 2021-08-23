@@ -40,9 +40,10 @@ import models.InboundMessage as InboundMessage
 @app.route('/', methods=['GET','POST'])
 @app.route('/<groupId>', methods=['GET','POST'])
 def webhook(groupId = ''):
-	res = "No Message Posted"
-	respStatus = 204
+
 	if request.method == 'POST':
+		res = "No Message Posted"
+		respStatus = 204
 		payload = request.get_json()
 		inboundMessage = {}
 		if payload.get("group_id"):
@@ -77,19 +78,19 @@ def webhook(groupId = ''):
 						inboundMessage.outboundMessage = outboundMessage
 						db.session.add(outboundMessage)
 						res, respStatus = response.send()
-					db.session.commit()
 				else:
 					res = "Group not found"
 					respStatus = 404
 			else:
 				res = "Malformed message"
 				respStatus = 404
-			db.session.commit()
-			return Response(res, status=respStatus, content_type='application/json')
-		if request.method == 'GET':
-			images, status = AWS.getBucketContents(config.BUCKET_NAME)
-			images = json.loads(images)
-			return render_template('index.html', imageList = images)
+		db.session.commit()
+		return Response(res, status=respStatus, content_type='application/json')
+		
+	if request.method == 'GET':
+		images, status = AWS.getBucketContents(config.BUCKET_NAME)
+		images = json.loads(images)
+		return render_template('index.html', imageList = images)
 
 @app.route('/api/sendMessage/<groupId>', methods=['POST'])
 def sendMessage(groupId = ''):
