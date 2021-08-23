@@ -10,10 +10,11 @@ class OutboundMessage(db.Model):
     createdDateTime = db.Column(db.DateTime)
     group_id = db.Column(db.Integer(), ForeignKey('groups.id'))
     triggeringUser = db.Column(db.String())
+    inboundMessage = relationship("InboundMessage", back_populates="outboundMessage")
 
     def __init__(self, response):
         self.messageText = response.responseText
-        self.createdDateTime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+        self.createdDateTime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self.groupMeGroup = response.groupMeGroup
         self.group_id = response.groupMeGroup.group.id
         self.triggeringUser = response.inboundMessagePayload.get("sender_id")

@@ -10,20 +10,20 @@ class TalkingToBot(Default.DefaultMessageType):
         self.responseType = 'text'
         self.helpText = "--talkingToBot: trigger a response from the bot based on a mention of Bot's name"
         
-    def qualifyText(self, inboundMessage):
+    def qualifyText(self, text):
         if self.group.bot:
-            if self.group.bot.botName.lower() in inboundMessage.lower():
+            if self.group.bot.botName.lower() in text.lower():
                 return True
-            if 'insultbot' in inboundMessage.lower():
+            if 'insultbot' in text.lower():
                 return True
-            if 'insult bot' in inboundMessage.lower():
+            if 'insult bot' in text.lower():
                 return True
         if self.qualifyingText:
             for m in self.qualifyingText:
                 m = m.lower()
                 l = ["--"+m, "-"+m, "\u2014"+m]
                 for message in l:
-                    if message in inboundMessage.lower():
+                    if message in text.lower():
                         return True
         return False
 

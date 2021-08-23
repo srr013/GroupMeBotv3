@@ -27,7 +27,7 @@ import models.MessageTypes.messageTypes as systemMessageTypes
 class Group(db.Model):
     __tablename__ = 'groups'
     id = db.Column(db.Integer, primary_key=True)
-    groupId = db.Column(db.String())
+    groupId = db.Column(db.String(), unique=True)
     groupName = db.Column(db.String())
     botId = db.Column(db.String(), ForeignKey('bots.id'))
     counter_lowerBound = db.Column(db.Integer)
@@ -39,7 +39,8 @@ class Group(db.Model):
     messagingServiceStatus = db.Column(db.Boolean)
     # creatingUser = db.Column(db.Integer)
     # users = db.Column(ARRAY(db.Integer, ForeignKey('users.id')))
-    bot = relationship("Bot", back_populates="groups")
+    bot = relationship("Bot", back_populates="group")
+    inboundMessage = relationship("InboundMessage", back_populates="group")
     # user_id = relationship("User", back_populates="groups")
 
 

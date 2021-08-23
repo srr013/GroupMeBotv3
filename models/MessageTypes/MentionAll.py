@@ -8,10 +8,10 @@ class MentionAll(Default.DefaultMessageType):
         self.responseType = 'mention'
         self.helpText = "@all: tag all users in the GroupMe"
 
-    def qualifyText(self, inboundMessage):
+    def qualifyText(self, text):
         if self.qualifyingText:
             for m in self.qualifyingText:
-                if m in inboundMessage.lower():
+                if m in text.lower():
                     return True
         return False
 
@@ -21,14 +21,14 @@ class MentionAll(Default.DefaultMessageType):
         return start_text + ' '+ mentions + ' '+ end_text
 
 
-    def get_surrounding_text(self, inboundMessage):
-        l = inboundMessage.lower()
+    def get_surrounding_text(self, text):
+        l = text.lower()
         start_index = l.find("@all")
         start_text = ""
         if start_index > 0:
-            start_text = inboundMessage[0:start_index]
+            start_text = text[0:start_index]
         end_index = start_index + 4
-        end_text = inboundMessage[end_index+1:len(inboundMessage)]
+        end_text = text[end_index+1:len(text)]
         return start_text, end_text
 
     def create_mention_text(self, response):

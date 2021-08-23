@@ -10,14 +10,14 @@ class TLDR(Default.DefaultMessageType):
         self.responseType = 'command'
         self.helpText = "--tldr: trigger a response from the bot due to a long message"
         
-    def qualifyText(self, inboundMessage):
-        if inboundMessage.count(' ') > 100:
+    def qualifyText(self, text):
+        if text.count(' ') > 100:
             return True
         if self.qualifyingText:
             for m in self.qualifyingText:
                 l = ["--"+m, "-"+m, "\u2014"+m]
                 for message in l:
-                    if message in inboundMessage.lower():
+                    if message in text.lower():
                         return True
         return False
 

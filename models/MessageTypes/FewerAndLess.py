@@ -8,10 +8,10 @@ class FewerAndLess(Default.DefaultMessageType):
         self.responseType = 'text'
         self.messageCategory = "command"
 
-    def qualifyText(self, inboundMessage):
+    def qualifyText(self, text):
         if self.qualifyingText:
             for m in self.qualifyingText:
-                if m in inboundMessage.lower():
+                if m in text.lower():
                     return True
         return False
 

@@ -9,8 +9,7 @@ class Bot(db.Model):
     callbackUrl = db.Column(db.String())
     avatarUrl = db.Column(db.String())
     createdDate = db.Column(db.Date)
-
-    groups = relationship("Group", back_populates="bot")
+    group = relationship("Group", back_populates="bot")
 
     def __init__(self, botId, botName, callbackUrl, avatarUrl):
         self.id = botId

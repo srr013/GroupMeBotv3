@@ -13,13 +13,11 @@ import services.config as config
 
 
 from services.GroupmeGroup import GroupmeGroup
-import services.InboundMessage as InboundMessage
+
 from services.Response import Response as MessageResponse
 import services.aws as AWS
 
 import models.MessageTypes.SendMessageFromAPI as SendMessageFromAPI
-
-
 
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
@@ -34,6 +32,7 @@ from models.Group import Group
 # from models.User import User
 from models.Bot import Bot
 import models.OutboundMessage as OutboundMessage
+import models.InboundMessage as InboundMessage
 
 
 # Called whenever the app's callback URL receives a POST request
@@ -45,45 +44,52 @@ def webhook(groupId = ''):
 	respStatus = 204
 	if request.method == 'POST':
 		payload = request.get_json()
-		if not groupId:
-			groupId = payload.get('group_id')
-		if groupId:
-			g = db.session.query(Group).filter_by(groupId=groupId).first()
-			if g:
-				g.initializeGroupData()
-				group = GroupmeGroup(g)
-				if not InboundMessage.isBotOrSystemMessage(payload):
-					group.incrementCounter()
-				response = MessageResponse(group, payload)
-				bot = db.session.query(Bot).filter_by(id=g.botId).first()
-				group.bot = bot
-				#set the messageObject to send the message from that object
-				#check for written triggers
-				response.messageObject = InboundMessage.parseMessageContent(payload, group, response, bot)
-				#check for random content
-				if not response.messageObject:
-					if group.readyForMessage():
-						response.messageObject = response.getTriggeredResponse(group)
-				
-				#send the queued message
-				if response.messageObject:
-					response.responseText = response.messageObject.constructResponseText(payload, response)
-					response.messageObject.updateGroupData()
-					outboundMessage = OutboundMessage.OutboundMessage(response)
-					db.session.add(outboundMessage)
-					res, respStatus = response.send()
-				db.session.commit()
+		inboundMessage = {}
+		if payload.get("group_id"):
+			if groupId != payload.get("group_id"):
+				logging.info(f"Message group ID and endpoint don't match. Message contents has groupID:{inboundMessage.grouId} while endpoint is {groupId}")
+				inboundMessage.groupId = groupId
+			inboundMessage = InboundMessage.InboundMessage(payload)
+			db.session.add(inboundMessage)
+			if inboundMessage:
+				g = db.session.query(Group).filter_by(groupId=inboundMessage.groupId).first()
+				if g:
+					g.initializeGroupData()
+					groupMeGroup = GroupmeGroup(g)
+					if not inboundMessage.isBotOrSystemMessage(payload):
+						groupMeGroup.incrementCounter()
+					response = MessageResponse(groupMeGroup, payload)
+					bot = db.session.query(Bot).filter_by(id=g.botId).first()
+					groupMeGroup.bot = bot
+					#set the messageObject to send the message from that object
+					#check for written triggers
+					response.messageObject = inboundMessage.parseMessageContent(payload, groupMeGroup, response, bot)
+					#check for random content
+					if not response.messageObject:
+						if groupMeGroup.readyForMessage():
+							response.messageObject = response.getTriggeredResponse(groupMeGroup)
+					
+					#send the queued message
+					if response.messageObject:
+						response.responseText = response.messageObject.constructResponseText(payload, response)
+						response.messageObject.updateGroupData()
+						outboundMessage = OutboundMessage.OutboundMessage(response)
+						inboundMessage.outboundMessage = outboundMessage
+						db.session.add(outboundMessage)
+						res, respStatus = response.send()
+					db.session.commit()
+				else:
+					res = "Group not found"
+					respStatus = 404
 			else:
-				res = "Group not found"
+				res = "Malformed message"
 				respStatus = 404
-		else:
-			res = "Malformed message"
-			respStatus = 404
-		return Response(res, status=respStatus, content_type='application/json')
-	if request.method == 'GET':
-		images, status = AWS.getBucketContents(config.BUCKET_NAME)
-		images = json.loads(images)
-		return render_template('index.html', imageList = images)
+			db.session.commit()
+			return Response(res, status=respStatus, content_type='application/json')
+		if request.method == 'GET':
+			images, status = AWS.getBucketContents(config.BUCKET_NAME)
+			images = json.loads(images)
+			return render_template('index.html', imageList = images)
 
 @app.route('/api/sendMessage/<groupId>', methods=['POST'])
 def sendMessage(groupId = ''):
@@ -95,11 +101,11 @@ def sendMessage(groupId = ''):
 			g = db.session.query(Group).filter_by(groupId=groupId).first()
 			if g:
 				g.initializeGroupData()
-				group = GroupmeGroup(g)
-				response = MessageResponse(group, payload)
+				groupMeGroup = GroupmeGroup(g)
+				response = MessageResponse(groupMeGroup, payload)
 				bot = db.session.query(Bot).filter_by(id=g.botId).first()
-				group.bot = bot
-				response.messageObject = SendMessageFromAPI.SendMessageFromAPI(group)
+				groupMeGroup.bot = bot
+				response.messageObject = SendMessageFromAPI.SendMessageFromAPI(groupMeGroup)
 				if payload.get('isImage'):
 					bucket = AWS.getBucket('insultbot-memes')
 					fileObjs = AWS.getFileObjsFromBucket(bucket, payload.get("imageName"))

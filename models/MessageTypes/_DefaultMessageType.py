@@ -8,10 +8,7 @@ class DefaultMessageType():
         self.responseText = ''
         self.isQualified = False
         self.group = group
-        # self.response = response
-        # self.inboundPayload = payload
-        # self.inboundMessage = payload.get("text")
-        # self.inboundUser = payload.get("name")
+
         self.messageCategory = "command"
         self.randUpperBound = 0
         self.randLowerBound = 0
@@ -21,12 +18,12 @@ class DefaultMessageType():
         }
         self.helpText = ''
     
-    def qualifyText(self, inboundMessage):
+    def qualifyText(self, text):
         if self.qualifyingText:
             for m in self.qualifyingText:
                 l = ["--"+m, "-"+m, "\u2014"+m]
                 for message in l:
-                    if message in inboundMessage.lower():
+                    if message in text.lower():
                         return True
         return False
     

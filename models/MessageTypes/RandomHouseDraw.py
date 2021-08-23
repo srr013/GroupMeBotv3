@@ -13,8 +13,8 @@ class RandomHouseDraw(Default.DefaultMessageType):
     
     def constructResponseText(self, payload, response):
         responseText = ''
-        inboundMessage = payload.get('text')
-        command = inboundMessage.split(" ")
+        text = payload.get('text')
+        command = text.split(" ")
         houseList = self.getHouseList(command[1])
         random.shuffle(houseList)
         names = response.groupMeGroup.memberNames.copy()
