@@ -51,7 +51,7 @@ def webhook(groupId = ''):
 				logging.info(f"Message group ID and endpoint don't match. Message contents has groupID:{inboundMessage.grouId} while endpoint is {groupId}")
 				inboundMessage.groupId = groupId
 			inboundMessage = InboundMessage.InboundMessage(payload)
-			db.session.add(inboundMessage)
+			# db.session.add(inboundMessage)
 			if inboundMessage:
 				g = db.session.query(Group).filter_by(groupId=inboundMessage.groupId).first()
 				if g:
@@ -86,7 +86,7 @@ def webhook(groupId = ''):
 				respStatus = 404
 		db.session.commit()
 		return Response(res, status=respStatus, content_type='application/json')
-		
+
 	if request.method == 'GET':
 		images, status = AWS.getBucketContents(config.BUCKET_NAME)
 		images = json.loads(images)
