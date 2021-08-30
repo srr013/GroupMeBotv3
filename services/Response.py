@@ -81,6 +81,7 @@ class Response():
     def get_message_loci(self):
         loci = []
         for name in self.groupMeGroup.memberNicknames:
+            start = 0
             start = self.responseText.find(name)
             if start:
                 end = start + len(name)
