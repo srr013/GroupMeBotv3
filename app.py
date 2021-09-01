@@ -158,7 +158,7 @@ def manageGroups(id = ''):
 		if payload and groupId:
 			g = db.session.query(Group).filter_by(groupId=groupId).first()
 			if not g:
-				group = Group(groupId, botId, groupName)
+				group = Group(groupId, botId, groupName, payload=payload)
 				group.createGroupData()
 				db.session.add(group)
 				res = "Group created"

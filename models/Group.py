@@ -44,17 +44,17 @@ class Group(db.Model):
     # user_id = relationship("User", back_populates="groups")
 
 
-    def __init__(self, groupId, botId, groupName):
-        self.groupId = groupId
-        self.groupName = groupName
-        self.botId = botId
-        self.counter_lowerBound = 10
-        self.counter_upperBound = 15
-        self.counter_currentThreshold = self.counter_upperBound
-        self.counter_current = 0
-        self.active = True
-        self.messagingServiceStatus = True
-        self.messageTypes = {}
+    def __init__(self, groupId, botId, groupName, payload={}):
+        self.groupId = groupId if groupId else payload.get('groupId')
+        self.groupName = groupName if groupName else payload.get('groupName', "default")
+        self.botId = botId if botId else payload.get('botId')
+        self.counter_lowerBound = payload.get('counter_lowerBound', 10)
+        self.counter_upperBound = payload.get('counter_upperBound', 15)
+        self.counter_currentThreshold = payload.get('counter_currentThreshold', self.counter_lowerBound)
+        self.counter_current = payload.get('counter_current', 0)
+        self.active = payload.get('active', True)
+        self.messagingServiceStatus = payload.get('messagingServiceStatus', True)
+        self.messageTypes = payload.get('messageTypes', {})
         self.messageObjectList = []
 
 

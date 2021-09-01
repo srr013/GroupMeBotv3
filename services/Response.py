@@ -81,9 +81,8 @@ class Response():
     def get_message_loci(self):
         loci = []
         for name in self.groupMeGroup.memberNicknames:
-            start = 0
             start = self.responseText.find(name)
-            if start:
+            if start != -1:
                 end = start + len(name)
                 #logging.warning("Loci are: " + start +" " +end])
                 loci.append([start, end])
