@@ -221,6 +221,7 @@ def manageBots(id = ''):
 		payload = request.get_json()
 		groupId = str(payload.get('groupId'))
 		g = db.session.query(Group).filter_by(groupId=groupId).first()
+		logging.warn(payload)
 		if payload.get("id"):
 			bot = db.session.query(Bot).filter_by(id=id).first()
 			if not bot:
