@@ -221,9 +221,12 @@ def manageBots(id = ''):
 		payload = request.get_json()
 		groupId = str(payload.get('groupId'))
 		g = db.session.query(Group).filter_by(groupId=groupId).first()
-		if g and payload.get("id"):
-			bot = Bot(payload["id"], payload["botName"], payload["botCallbackUrl"], payload["avatarUrl"])
-			g.botId = payload["id"]
+		if payload.get("id"):
+			bot = db.session.query(Bot).filter_by(id=id).first()
+			if not bot:
+				bot = Bot(payload["id"], payload["botName"], payload["botCallbackUrl"], payload["avatarUrl"])
+			if g:
+				g.botId = payload["id"]
 			db.session.add(bot)
 			res = "Bot created in DB and group updated! No GroupMe Action taken."
 			respStatus  = 201

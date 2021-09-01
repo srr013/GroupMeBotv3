@@ -24,10 +24,10 @@ class Bot(db.Model):
 
     def deserialize(self):
         bot = {
-            "Bot Name": self.botName,
-            "ID": self.id,
-            "Callback Url":self.callbackUrl,
-            "Avatar Url": self.avatarUrl,
-            "Created Date": self.createdDate.strftime("%Y-%m-%d")
+            "botName": self.botName,
+            "id": self.id,
+            "callbackUrl":self.callbackUrl,
+            "avatarUrl": self.avatarUrl,
+            "createdDate": self.createdDate.strftime("%Y-%m-%d")
         }
         return bot
