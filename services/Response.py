@@ -25,7 +25,7 @@ class Response():
             #set the random selection range for each message type
             if m.messageCategory == 'random':
                 messageObjects.append(m)
-                randUpperBound += m.getRandBoundary(randUpperBound)
+                randUpperBound = m.getRandBoundary(randUpperBound)
         #select the random #
         if randUpperBound > 0:
             selector = random.randint(0, randUpperBound)
@@ -41,12 +41,13 @@ class Response():
             url = 'https://api.groupme.com/v3/bots/post'
             body = {}
             if self.messageObject.responseType == 'mention':
+                loci, memberIds = self.get_message_loci()
                 body = {'bot_id': self.groupMeGroup.group.botId,
                         'text': self.responseText,
                         'attachments': [
                             {"type": "mentions",
-                            "loci": self.get_message_loci(),
-                            "user_ids": self.groupMeGroup.memberIds}
+                            "loci": loci,
+                            "user_ids": memberIds}
                         ]
                     }
             elif self.messageObject.responseType == 'text':
@@ -80,13 +81,15 @@ class Response():
 
     def get_message_loci(self):
         loci = []
-        for name in self.groupMeGroup.memberNicknames:
-            start = self.responseText.find(name)
+        memberIds = []
+        for member in self.groupMeGroup.members:
+            start = self.responseText.find(member['nickname'])
             if start != -1:
-                end = start + len(name)
+                end = start + len(member['nickname'])
                 #logging.warning("Loci are: " + start +" " +end])
                 loci.append([start, end])
-        return loci
+                memberIds.append(member['id'])
+        return loci, memberIds
     
     #Uploads image to GroupMe's services and returns the new URL
     def upload_image_to_groupme(self, filename):

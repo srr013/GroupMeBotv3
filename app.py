@@ -48,7 +48,7 @@ def webhook(groupId = ''):
 		inboundMessage = {}
 		if payload.get("group_id"):
 			if groupId != payload.get("group_id"):
-				logging.info(f"Message group ID and endpoint don't match. Message contents has groupID:{inboundMessage.grouId} while endpoint is {groupId}")
+				logging.info(f"Message group ID and endpoint don't match. Message contents has groupID:{inboundMessage.groupId} while endpoint is {groupId}")
 				inboundMessage.groupId = groupId
 			inboundMessage = InboundMessage.InboundMessage(payload)
 			# db.session.add(inboundMessage)

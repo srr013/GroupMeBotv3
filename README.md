@@ -18,3 +18,8 @@ Managing a local and PRD DB:
 Need to manage each individually. Binds parameter doesn't seem applicable. don't gitignore the migrations folder. May need to truncate the remote DB alembic_version table before running manage.py upgrade.
 
 when migrating/upgrading it needs to be done to all servers. Otherwise you need to drop and re-create locally then remotely?
+
+Run specific database changes directly on the DB table/column to allow a migration/upgrade without dropping the table. e.g.
+ALTER TABLE groups ADD CONSTRAINT constraint_name UNIQUE ("groupId");
+
+Or SSH into the Heroku host and make updates there. Allows you to perform the init and migrate + upgrade properly if CLI doesn't work.

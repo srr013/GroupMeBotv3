@@ -5,3 +5,6 @@ __pycache__/settings.cpython-38.pyc
 test.py
 example_data/*
 temp/*.jpg
+*.pyc
+*~
+*.swp

@@ -13,7 +13,8 @@ class GroupmeGroup():
         if self.rawData:
             self.data = json.loads(self.rawData.text)
             if self.data.get("response"):
-                self.memberNicknames = self.getMembers()
+                self.members = self.getMembers()
+                self.memberNicknames = self.getMemberNicknames()
                 self.memberIds = self.getMemberIds()
                 self.memberNames = self.getNames()
                 self.groupName = self.data['response']['name']
@@ -33,8 +34,20 @@ class GroupmeGroup():
             return response
         else:
             return {}
-    
     def getMembers(self):
+        members = []
+        for member in self.data["response"]["members"]:
+            members.append(
+                {
+                    'id': member.get('user_id'),
+                    'nickname': member.get('nickname'),
+                    'name': member.get('name')
+                }
+                )
+        return members
+
+
+    def getMemberNicknames(self):
         members = []
         for member in self.data["response"]["members"]:
             members.append(member['nickname'])
