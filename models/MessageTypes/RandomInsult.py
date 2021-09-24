@@ -7,7 +7,7 @@ class RandomInsult(Default.DefaultMessageType):
     def __init__(self, group):
         super().__init__(group)
         self.qualifyingText =['insult']
-        self.qualifyingPercent = 100
+        self.qualifyingPercent = 20
         self.responseType = 'mention'
         self.messageCategory = 'random'
         self.helpText = '--insult: bot will send a random insult about you'
