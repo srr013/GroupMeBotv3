@@ -1,5 +1,4 @@
 insults = [
-"Aging",
 "Amateur",
 "Animal",
 "Anorak",
