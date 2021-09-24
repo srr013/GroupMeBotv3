@@ -8,7 +8,7 @@ class StopMessagingService(Default.DefaultMessageType):
         self.responseType = 'text'
         self.responseText = ''
         self.isQualified = False
-        self.helpText = "--start: start the messaging service, which allows Bot to send messages. Bot will always respond to --commands."
+        self.helpText = "--stop: Stop the messaging service. Bot will always respond to --commands."
 
     def constructResponseText(self, payload, response):
         responseText = """
