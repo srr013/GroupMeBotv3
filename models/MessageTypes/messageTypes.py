@@ -10,6 +10,7 @@ types = [
     "RandomImage",
     "TalkingToBot",
     "TLDR",
-    "FewerAndLess"
+    "FewerAndLess",
+    "StopSwearingYouDick"
     ]
 #You must also add these modules into Group.py

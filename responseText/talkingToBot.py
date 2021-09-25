@@ -12,7 +12,6 @@ talkingToBot = [
 	"What value do you even bring to this league?",
 	"Well yes and no.",
 	"Maybe",
-	"Be gone troll",
 	"...",
 	"I need a beer",
 	"Smoke weed every day",
@@ -32,5 +31,8 @@ talkingToBot = [
 	"This guy's an idiot ^",
 	"D=",
 	":-O",
-	":x"
+	":x",
+	"Talk to the hand because the bot ain't listening",
+	"This is an A and B conversation so fuck off.",
+	"Why don't you make like a library and shut the fuck up"
 ]

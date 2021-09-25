@@ -22,6 +22,7 @@ import models.MessageTypes.RandomImage as RandomImage
 import models.MessageTypes.TalkingToBot as TalkingToBot
 import models.MessageTypes.TLDR as TLDR
 import models.MessageTypes.FewerAndLess as FewerAndLess
+import models.MessageTypes.StopSwearingYouDick as StopSwearingYouDick
 import models.MessageTypes.messageTypes as systemMessageTypes
 
 class Group(db.Model):
@@ -56,6 +57,7 @@ class Group(db.Model):
         self.messagingServiceStatus = payload.get('messagingServiceStatus', True)
         self.messageTypes = payload.get('messageTypes', {})
         self.messageObjectList = []
+        self.s3Content = ''
 
 
     def __repr__(self):

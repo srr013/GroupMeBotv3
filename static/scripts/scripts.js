@@ -1,8 +1,9 @@
-function submitForm (){
+function submitForm (element){
     let form = document.getElementById('upload-form')
     var formData = new FormData(form);
+    groupId = element.dataset.groupid;
     $.ajax({
-        url: window.location.origin + '/api/buckets',
+        url: window.location.origin + '/api/buckets/'+groupId,
         type: 'POST',
         data: formData,
         async: true,
@@ -12,22 +13,23 @@ function submitForm (){
     })
     .done(function(val){
         console.log(val)
-        $("#imageUploadForm-uploadStatus").html("Upload status: " + val.text)
+        $("#imageUploadForm-uploadStatus").html("Upload status: " + val.bucketData)
     })
     .fail(function(val){
-        $("#imageUploadForm-uploadStatus").html("Error uploading file: " + val.text)
+        $("#imageUploadForm-uploadStatus").html("Error uploading file: "  + val.bucketData)
         console.log("Error uploading file: ")
         console.log(val)
     })
 }
 
-function deleteImage (element){
-    imageName = element.dataset.image;
-    console.log(imageName);
+function deleteFile (element){
+    fileName = element.dataset.file;
+    groupId = element.dataset.groupid;
+    console.log(fileName);
     parentLi = element.parentElement
     console.log(parentLi)
     $.ajax({
-        url: window.location.origin + '/api/buckets?filename='+imageName,
+        url: window.location.origin + '/api/buckets/'+groupId+'?filepath='+fileName,
         type: 'DELETE',
         async: true,
         cache: false,

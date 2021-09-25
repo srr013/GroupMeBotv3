@@ -15,19 +15,27 @@
                 <form name="imageUploadForm" id="upload-form" action="" method="post" enctype="multipart/form-data">
                     <input type=file name=file>
                 </form>
-                <button onclick="submitForm()">Submit</button>
+                <button onclick="submitForm(this)"  data-groupid={{groupId}}>Submit</button>
                 <p id="imageUploadForm-uploadStatus" class="status-text"></p>
             </div>
             <div class="image-list">
                 <p>List of current memes:</p>
                 <p>(Reload page to see recent upload)</p>
-                <ul>
-                {% for image in imageList %}
+                <ul>Images:
+                {% for image in fileList['images'] %}
                     <li>
-                        <a href="/api/images/{{image}}">{{ image }}</a>
-                        <button onclick="deleteImage(this)" data-image={{image}}>Delete</button>
+                        <a href="/api/files/{{groupId}}/images/{{image}}">{{ image }}</a>
+                        <button onclick="deleteFile(this)" data-file={{image}} data-groupid={{groupId}}>Delete</button>
                     </li>
                 {% endfor %}
+                </ul>
+                <ul>Responses:
+                    {% for response in fileList['text'] %}
+                        <li>
+                            <a href="/api/files/{{groupId}}/text/{{response}}">{{ response }}</a>
+                            <button onclick="deleteFile(this)" data-file={{response}} data-groupid={{groupId}}>Delete</button>
+                        </li>
+                    {% endfor %}
                 </ul>
             </div>
         </div>

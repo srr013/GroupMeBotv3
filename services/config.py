@@ -17,5 +17,5 @@ AWS_S3_USER_KEY = clean('AWS_S3_USER_KEY')
 AWS_S3_USER_SECRET = clean('AWS_S3_USER_SECRET')
 BUCKET_NAME = 'insultbot-memes'
 UPLOAD_FOLDER = 'temp'
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'json'}
 DEFAULT_IMAGE_NAME = 'notFoundYouJackass.jpg'

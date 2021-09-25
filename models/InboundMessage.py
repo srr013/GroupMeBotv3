@@ -23,40 +23,26 @@ class InboundMessage(db.Model):
         self.groupId = payload.get("group_id")
         self.sendingUser = payload.get("sender_id")
         self.sendingUserType = payload.get("sender_type")
+        self.sourceGuid = payload.get("source_guid")
         self.outboundMessageId = None
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
 
-    def parseMessageContent(self, payload, group, response, bot):
-        messageModuleList = []
-        inboundMessage = payload.get('text')
-
-        if self.validateGroupmePost(payload):
-            #create the message type modules and 
-            #check if inbound text meets any qualifyingText parameters
-            group.messageObjects = group.group.getMessageObjects()
-
-            for m in group.messageObjects:
-                #check for a command and process only the first command
-                if m.qualifyText(inboundMessage):
-                    return m
-        return {}
-
-    def validateGroupmePost(self, payload, allowBot=False):
+    def validateGroupmePost(self, allowBot=False):
         isValid = False
         if allowBot:
-            if payload.get('sender_type') != "system"\
-                and payload.get('text') \
-                    and payload.get('group_id') \
-                        and payload.get("source_guid"):
+            if self.sendingUserType != "system"\
+                and self.messageText('text') \
+                    and self.groupId('group_id') \
+                        and self.sourceGuid:
                 isValid = True
         else:
-            if payload.get('sender_type') not in ["bot", "system"] \
-                and payload.get('sender_type') \
-                    and payload.get('group_id') \
-                        and payload.get('text')  \
-                            and payload.get("source_guid"):
+            if self.sendingUserType not in ["bot", "system"] \
+                and self.sendingUserType \
+                    and self.groupId \
+                        and self.messageText  \
+                            and self.sourceGuid:
                 isValid = True
         return isValid
 

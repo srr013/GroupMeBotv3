@@ -25,7 +25,26 @@ def getBucketContents(bucketName):
     try:
         bucket = getBucket(bucketName)
         if bucket.get('Contents'):
-            res = json.dumps([b.get('Key') for b in bucket.get('Contents')])
+            contents = [b.get('Key') for b in bucket.get('Contents')]
+            returnValues = {}
+            # raise Exception
+            for item in contents:
+                item = item.split("/")
+                i = 0
+                pointer = returnValues
+                while i < len(item):
+                    if not pointer.get(item[i], None):
+                        pointer[item[i]] = {}
+                    if i == len(item) - 2:
+                        if isinstance(pointer[item[i]], list):
+                            pointer[item[i]].append(item[i+1])
+                        else:
+                            pointer[item[i]] = [item[i+1]]
+                        break
+                    else:
+                        pointer = pointer[item[i]]
+                        i += 1
+            res = returnValues
             status = 200
         else:
             res = "Bucket is empty" #Value not returned with 204
@@ -35,18 +54,24 @@ def getBucketContents(bucketName):
         res = f"Error getting bucket: {bucketName}"
     return res, status
 
-def getFileObjsFromBucket(bucket, filename=''):
+def getGroupFileObjsFromBucket(bucket, groupId, directory='',filename=''):
+    contents = []
     if filename and bucket.get('Contents'):
-        for image in bucket.get('Contents'):
-            if image.get('Key') == filename:
-                return [image]
-        #send the default image if a filename is specified and not found
-        for image in bucket.get('Contents'):
-            if image.get('Key') == config.DEFAULT_IMAGE_NAME:
-                return [image]
+        for s3File in bucket.get('Contents'):
+            s3FilePath = s3File.get('Key').split("/")
+            if len(s3FilePath) == 3 and directory:
+                if s3FilePath[0] == groupId:
+                    if s3FilePath[1] == directory:
+                        if s3FilePath[2].lower() == filename.lower():
+                            contents = [s3File]
     elif bucket.get('Contents'):
-        return bucket.get('Contents')
-    return []
+        for s3File in bucket.get('Contents'):
+            s3FilePath = s3File.get('Key').split("/")
+            if s3FilePath[0] == groupId:
+                contents.append(s3File)
+    else:
+        logging.error(f'Bucket has no "Contents" key')
+    return contents
 
 def downloadFileFromBucket(bucket, fileObject):
     fn = fileObject.get('Key')
@@ -61,7 +86,10 @@ def downloadFileFromBucket(bucket, fileObject):
 
 def putFileInBucket(fileName, bucket):
     try:
-        result = s3.upload_file(os.path.join("temp", fileName), bucket, fileName)
+        #only filenames that are passed through
+        path = fileName.split("_")
+        fileName = fileName.replace("_", "/")
+        result = s3.upload_file(os.path.join(config.UPLOAD_FOLDER, *path), bucket, fileName)
     except Exception as e:
         logging.error(f'File upload failed with error: {e}')
         return f"Error uploading file: {fileName}", 404
@@ -69,18 +97,18 @@ def putFileInBucket(fileName, bucket):
 
 def deleteFileInBucket(fileName, bucketName):
     bucket = getBucket(bucketName)
-    if getFileObjsFromBucket(bucket, filename=fileName):
-        try:
-            s3.delete_object(Bucket=bucketName,Key=fileName)
-            res = f"{fileName} deleted successfully"
-            status = 200
-        except Exception as e:
-            logging.error(f'File deletion failed with error: {e}')
-            res = f"Error deleting file {fileName}"
-            status = 404
-    else:
-        res = f"{fileName} not found in bucket"
+    # if getGroupFileObjsFromBucket(bucket, filename=fileName):
+    try:
+        s3.delete_object(Bucket=bucketName,Key=fileName)
+        res = f"{fileName} deleted successfully"
+        status = 200
+    except Exception as e:
+        logging.error(f'File deletion failed with error: {e}')
+        res = f"Error deleting file {fileName}"
         status = 404
+    # else:
+    #     res = f"{fileName} not found in bucket"
+    #     status = 404
     return res, status
 
 	# 	for bucket in s3.buckets.

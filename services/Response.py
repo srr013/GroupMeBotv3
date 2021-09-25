@@ -16,7 +16,7 @@ class Response():
         self.responseText = "No content set"
 
 
-    def getTriggeredResponse(self, group):
+    def getRandomCategoryResponse(self, group):
         #No commands were provided, checking for random message
         #assign each module that has a qualifying percent a number range
         messageObjects = []
@@ -33,6 +33,21 @@ class Response():
                 #if the selected number falls within random selection range
                 if m.randLowerBound <= selector <= m.randUpperBound:
                     return m
+
+    def checkMessageForQualifyingText(self, inboundMessage, groupMeGroup):
+        messageModuleList = []
+        if inboundMessage.validateGroupmePost():
+            #create the message type modules and 
+            #check if inbound text meets any qualifyingText parameters
+            groupMeGroup.messageObjects = groupMeGroup.group.getMessageObjects()
+
+            for m in groupMeGroup.messageObjects:
+                #check for a command and process only the first command
+                if m.qualifyText(inboundMessage.messageText):
+                    return m
+        return {}
+
+
 
     def send(self):
         statusCode = 0

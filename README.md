@@ -23,3 +23,4 @@ Run specific database changes directly on the DB table/column to allow a migrati
 ALTER TABLE groups ADD CONSTRAINT constraint_name UNIQUE ("groupId");
 
 Or SSH into the Heroku host and make updates there. Allows you to perform the init and migrate + upgrade properly if CLI doesn't work.
+heroku ps:exec to ssh

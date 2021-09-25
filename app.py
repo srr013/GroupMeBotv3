@@ -64,12 +64,12 @@ def webhook(groupId = ''):
 					groupMeGroup.bot = bot
 					#set the messageObject to send the message from that object
 					#check for written triggers
-					response.messageObject = inboundMessage.parseMessageContent(payload, groupMeGroup, response, bot)
+					response.messageObject = response.checkMessageForQualifyingText(inboundMessage, groupMeGroup)
 					#check for random content
 					if not response.messageObject:
 						if groupMeGroup.readyForMessage():
-							response.messageObject = response.getTriggeredResponse(groupMeGroup)
-					
+							g.s3Content = AWS.getGroupFileObjsFromBucket(config.BUCKET_NAME, groupId)
+							response.messageObject = response.getRandomCategoryResponse(groupMeGroup)				
 					#send the queued message
 					if response.messageObject:
 						response.responseText = response.messageObject.constructResponseText(payload, response)
@@ -88,9 +88,8 @@ def webhook(groupId = ''):
 		return Response(res, status=respStatus, content_type='application/json')
 
 	if request.method == 'GET':
-		images, status = AWS.getBucketContents(config.BUCKET_NAME)
-		images = json.loads(images)
-		return render_template('index.html', imageList = images)
+		files, status = AWS.getBucketContents(config.BUCKET_NAME)
+		return render_template('index.html', fileList = files.get(groupId), groupId=groupId)
 
 @app.route('/api/sendMessage/<groupId>', methods=['POST'])
 def sendMessage(groupId = ''):
@@ -109,7 +108,7 @@ def sendMessage(groupId = ''):
 				response.messageObject = SendMessageFromAPI.SendMessageFromAPI(groupMeGroup)
 				if payload.get('isImage'):
 					bucket = AWS.getBucket('insultbot-memes')
-					fileObjs = AWS.getFileObjsFromBucket(bucket, payload.get("imageName"))
+					fileObjs = AWS.getGroupFileObjsFromBucket(bucket, g.groupId, directory="images", fileName=payload.get("imageName"))
 					if fileObjs:
 						response.messageObject.responseType = 'image'
 						response.responseText = AWS.downloadFileFromBucket(bucket, fileObjs[0])
@@ -133,7 +132,7 @@ def healthCheck():
 	respStatus = 200
 	return Response(res, status=respStatus, content_type='application/json')
 
-@app.route('/api/authorize', methods=['POST'])
+@app.route('/api/authorize', methods=['POST']) #INCOMPLETE
 def validateToken():
 	import services.jwt as jwtService
 
@@ -286,47 +285,73 @@ def manageBots(id = ''):
 	db.session.commit()
 	return Response(res, status=respStatus, content_type='application/json')
 
-@app.route('/api/buckets', methods=['GET', 'POST', 'DELETE', 'PUT'])
-@app.route('/api/buckets/<bucketName>', methods=['GET', 'DELETE', 'PUT'])
-def manageBuckets(bucketName = ''):
-	if not bucketName:
-		bucketName = config.BUCKET_NAME
-	filename = ''
-	if request.args.get("filename"):
-		filename = request.args.get("filename")
-
+@app.route('/api/buckets', methods=['GET'])
+@app.route('/api/buckets/<groupId>', methods=['GET', 'DELETE', 'POST', 'PUT'])
+def manageBuckets(groupId = ''):
+	bucketName = config.BUCKET_NAME
+	g = db.session.query(Group).filter_by(groupId=groupId).first()
+	filepath = ''
+	if request.args.get("filepath"):
+		fp = request.args.get("filepath").replace("_","")
+		filepath = secure_filename(fp)
 	if request.method == 'GET':
-		res, status = AWS.getBucketContents(bucketName)
-		return Response(json.dumps({"text": res}), status=status, content_type='application/json')
+		res, respStatus = AWS.getBucketContents(bucketName)
 	elif request.method == 'POST':
 		res = 'No file provided'
 		respStatus = 404
-		if filename or 'file' in request.files:
-			if filename:
-				res, status =  AWS.putFileInBucket(filename, bucketName)
-			else:
-				file = request.files['file']
-        # If the user does not select a file, the browser submits an
-        # empty file without a filename.
-				if file.filename:
-					if AWS.allowed_file(file.filename):
-						filename = secure_filename(file.filename)
-						file.save(os.path.join(config.UPLOAD_FOLDER, filename))
-					else:
-						res = f"File extension not in allowed list: {config.ALLOWED_EXTENSIONS}"
-			if filename:
-				res, respStatus =  AWS.putFileInBucket(filename, bucketName)
-		return Response(json.dumps({"text": res}), status=respStatus, content_type='application/json')
+		if 'file' in request.files: #if file uploaded from web
+			file = request.files['file']
+			# If the user does not select a file, the browser submits an
+			# empty file without a filename.
+			if file.filename:
+				if AWS.allowed_file(file.filename):
+					filepath = secure_filename(file.filename)
+					filepath.replace("_", "")
+					dir = "images"
+					if "json" in filepath:
+						dir = "text"
+					groupDirectory = os.path.join(config.UPLOAD_FOLDER, g.groupId)
+					if not os.path.isdir(groupDirectory):
+						os.mkdir(groupDirectory)
+					fileDirectory = os.path.join(config.UPLOAD_FOLDER, g.groupId, dir)
+					if not os.path.isdir(fileDirectory):
+						os.mkdir(fileDirectory)
+					file.save(os.path.join(config.UPLOAD_FOLDER, g.groupId, dir, filepath))
+				else:
+					res = f"File extension not in allowed list: {config.ALLOWED_EXTENSIONS}"
+		elif request.data: #assumes only one file name per group with response data
+			body = request.get_json(force=True) #currently using body for text and query params for images
+			groupDirectory = os.path.join(config.UPLOAD_FOLDER, g.groupId)
+			if not os.path.isdir(groupDirectory):
+				os.mkdir(groupDirectory)
+			textDirectory = os.path.join(config.UPLOAD_FOLDER, g.groupId, "text")
+			if not os.path.isdir(textDirectory):
+				os.mkdir(textDirectory)
+			tempstore = os.path.join(config.UPLOAD_FOLDER, g.groupId, "text", "responses.json")
+			with open(tempstore, "w+") as f:
+				f.write(json.dumps(body))
+			filepath = secure_filename(os.path.join(g.groupId, "text", "responses.json"))
+		if filepath:
+			res, respStatus =  AWS.putFileInBucket(filepath, bucketName)
 	elif request.method == 'DELETE':
-		res, status =  AWS.deleteFileInBucket(filename, bucketName)
-		return Response(json.dumps({"text": res}), status=status, content_type='application/json')
+		filepath = request.args.get('filepath')
+		res, respStatus =  AWS.deleteFileInBucket(filepath, bucketName)
+	return Response(json.dumps({"bucketData": res}), status=respStatus, content_type='application/json')
 		
-@app.route('/api/images/<imageName>', methods=['GET'])
-def manageImages(imageName = ''):
-	res = f"Image not found: {imageName}"
+@app.route('/api/files/<groupId>/<directory>/<fileName>', methods=['GET'])
+def manageImages(groupId = '', directory = '', fileName = ''):
+	res = f"File not found in {groupId}'s bucket: {directory}/{fileName}"
 	respStatus = 404
 	bucket = AWS.getBucket(config.BUCKET_NAME)
-	fileObjs = AWS.getFileObjsFromBucket(bucket, imageName)
+	fileObjs = AWS.getGroupFileObjsFromBucket(bucket, groupId, directory, filename = fileName)
+	if not fileObjs:
+		#send the default image if a filename is specified and not found
+		fileObjs = AWS.getGroupFileObjsFromBucket(bucket, groupId, filename = config.DEFAULT_IMAGE_NAME)
 	if request.method == 'GET':
 		res = AWS.downloadFileFromBucket(bucket, fileObjs[0])
-		return send_file(res, mimetype='image/jpeg')
+		mimetype = 'application/json'
+		if directory == 'images':
+			mimetype = 'image/jpeg'
+		return send_file(res, mimetype=mimetype)
+
+		
