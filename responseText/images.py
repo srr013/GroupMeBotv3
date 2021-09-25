@@ -9,5 +9,6 @@ meme_files = [
 	"mean.jpg",
 	"Tom.jpg",
 	"tradeoffers.jpg",
-	"yourteamsucks.png"
+	"yourteamsucks.png",
+	"toiletstore.jpg"
 ]
