@@ -68,7 +68,7 @@ def webhook(groupId = ''):
 					#check for random content
 					if not response.messageObject:
 						if groupMeGroup.readyForMessage():
-							g.s3Content = AWS.getGroupFileObjsFromBucket(config.BUCKET_NAME, groupId)
+							# g.s3Content = AWS.getGroupFileObjsFromBucket(config.BUCKET_NAME, groupId)
 							response.messageObject = response.getRandomCategoryResponse(groupMeGroup)				
 					#send the queued message
 					if response.messageObject:
