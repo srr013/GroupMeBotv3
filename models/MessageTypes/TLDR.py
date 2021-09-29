@@ -7,7 +7,7 @@ class TLDR(Default.DefaultMessageType):
     def __init__(self, group):
         super().__init__(group)
         self.qualifyingText =['tldr']
-        self.responseType = 'command'
+        self.responseType = 'text'
         self.helpText = "--tldr: trigger a response from the bot due to a long message"
         
     def qualifyText(self, text):
