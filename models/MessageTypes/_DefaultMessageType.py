@@ -1,3 +1,4 @@
+from operator import index
 import random
 
 class DefaultMessageType():
@@ -41,3 +42,15 @@ class DefaultMessageType():
         self.randLowerBound = randUpperBound
         self.randUpperBound = randUpperBound + self.qualifyingPercent
         return self.randUpperBound
+
+    def stringIsWordInText(self, key, text):
+        if key in text:
+            if " " + key + " " in text: #is it a standalone word?
+                return True
+            elif text.index(key) == 0 and key+" " in text: #is it the first word followed by others?
+                return True
+            elif text.index(key) == len(text)-len(key) and " "+key in text: #is it the last word?
+                return True
+            elif text.index(key) == 0 and len(text) == len(key): #is it the only word in the message?
+                return True
+        return False

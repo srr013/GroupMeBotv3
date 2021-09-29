@@ -13,7 +13,7 @@ class StopSwearingYouDick(Default.DefaultMessageType):
 
     def qualifyText(self, text):
         for key in stopSwearing.keys():
-            if key in text:
+            if self.stringIsWordInText(key, text):
                 self.qualifyingKey = key
                 return True
         if self.qualifyingText:
