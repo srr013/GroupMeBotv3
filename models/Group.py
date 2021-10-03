@@ -23,6 +23,7 @@ import models.MessageTypes.TalkingToBot as TalkingToBot
 import models.MessageTypes.TLDR as TLDR
 import models.MessageTypes.FewerAndLess as FewerAndLess
 import models.MessageTypes.StopSwearingYouDick as StopSwearingYouDick
+import models.MessageTypes.TwoPartMessageAwaitResponse as TwoPartMessageAwaitResponse
 import models.MessageTypes.messageTypes as systemMessageTypes
 
 class Group(db.Model):

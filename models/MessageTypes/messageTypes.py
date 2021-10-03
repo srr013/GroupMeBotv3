@@ -11,6 +11,7 @@ types = [
     "TalkingToBot",
     "TLDR",
     "FewerAndLess",
-    "StopSwearingYouDick"
+    "StopSwearingYouDick",
+    "TwoPartMessageAwaitResponse"
     ]
 #You must also add these modules into Group.py

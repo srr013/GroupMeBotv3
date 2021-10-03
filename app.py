@@ -64,7 +64,7 @@ def webhook(groupId = ''):
 					groupMeGroup.bot = bot
 					#set the messageObject to send the message from that object
 					#check for written triggers
-					response.messageObject = response.checkMessageForQualifyingText(inboundMessage, groupMeGroup)
+					response.messageObject = response.checkMessageForQualifyingAttributes(inboundMessage, groupMeGroup)
 					#check for random content
 					if not response.messageObject:
 						if groupMeGroup.readyForMessage():

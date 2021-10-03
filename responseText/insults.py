@@ -156,18 +156,6 @@ insults = [
 "Lumberjack"
 ]
 
-responses = [
-	"Nah",
-	"Yup. Uh huh.",
-	"And?",
-	"And then?",
-	"But do you actually think that?",
-	"Seems iffy",
-	"Cool. cool cool cool.",
-	"hm?",
-	"Why not?"
-]
-
 self_aware = [
 	"I wish my developer attached me to an interesting group",
 	"Sometimes I wonder what it would be like if I could go to sleep",

@@ -7,7 +7,7 @@ class RandomEncouragement(Default.DefaultMessageType):
     def __init__(self, group):
         super().__init__(group)
         self.qualifyingText =['encourage', 'encouragement']
-        self.qualifyingPercent = 20
+        self.qualifyingPercent = 10
         self.responseType = 'text'
         self.messageCategory = 'random'
         self.helpText = '--encourage: bot will send you a pick-me-up'

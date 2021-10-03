@@ -15,13 +15,17 @@ class DefaultMessageType():
         self.randLowerBound = 0
         self.typeDefinition = {
             "name": self.__class__.__name__,
-            "active": True
+            "active": True,
+            "action": ''
         }
         self.helpText = ''
+        self.followUpAction = '' #persists a state across message transmissions for a specific message type
+        self.messageSourceIndex = '' #persist (single session) the index of the message from the list of available messages
     
     def qualifyText(self, text):
         if self.qualifyingText:
             for m in self.qualifyingText:
+                m = m.lower()
                 l = ["--"+m, "-"+m, "\u2014"+m]
                 for message in l:
                     if message in text.lower():
@@ -31,6 +35,9 @@ class DefaultMessageType():
     def constructResponseText(self, payload, response):
         return ''
     
+    def performFollowUp(self):
+        pass
+
     def updateGroupData(self):
         self.updateGroup()
 
