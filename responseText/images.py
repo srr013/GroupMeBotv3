@@ -2,18 +2,13 @@ meme_files = [
 	"1.jpg",
 	"anditsgone.png",
 	"EverythingElseInLife.png",
-	"fear.jpg",
-	"Loser.png",
 	"luck.jpg",
-	"me.jpg",
-	"mean.jpg",
 	"Tom.jpg",
-	"tradeoffers.jpg",
 	"yourteamsucks.png",
-	"toiletstore.jpg",
+	"toiletstore.png",
 	"tenor.png",
 	"tumblr_mnmcstHKmH1sqhz72o5_1280.png",
 	"youre-just-spare-parts-arent-ya-bud.jpg",
 	"what-an-idiot.jpg",
-	"dubmass.jpg"
+	"dumbass.jpg"
 ]
