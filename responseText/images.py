@@ -10,5 +10,10 @@ meme_files = [
 	"Tom.jpg",
 	"tradeoffers.jpg",
 	"yourteamsucks.png",
-	"toiletstore.jpg"
+	"toiletstore.jpg",
+	"tenor.png",
+	"tumblr_mnmcstHKmH1sqhz72o5_1280.png",
+	"youre-just-spare-parts-arent-ya-bud.jpg",
+	"what-an-idiot.jpg",
+	"dubmass.jpg"
 ]
