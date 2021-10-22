@@ -34,6 +34,7 @@ class Response():
                 if m.randLowerBound <= selector <= m.randUpperBound:
                     return m
 
+    #Returns a message object, based on a qualification, to be used in response creation
     def checkMessageForQualifyingAttributes(self, inboundMessage, groupMeGroup):
         messageModuleList = []
         if inboundMessage.validateGroupmePost():
@@ -45,7 +46,9 @@ class Response():
                 #check for a command and process only the first command
                 if m.qualifyText(inboundMessage.messageText):
                     return m
+                #check the messageType JSON data stored for the group
                 for messageType in groupMeGroup.group.messageTypes:
+                    #finds the appropriate messageType and sets an action within it for use in response construction
                     #allows storage of a follow-up command for a given message type across messages
                     if messageType.get('action', None) is not None and messageType['name'] == m.__class__.__name__:
                         m.followUpAction = messageType['action']

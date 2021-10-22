@@ -54,6 +54,17 @@ def getBucketContents(bucketName):
         res = f"Error getting bucket: {bucketName}"
     return res, status
 
+def getFileObjFromBucket(bucket, filepath):
+    bucketFiles = getBucketContents(bucket)
+    if isinstance(bucketFiles, dict):
+        #TODO
+        pass
+    return
+
+
+
+
+
 def getGroupFileObjsFromBucket(bucket, groupId, directory='',filename=''):
     contents = []
     if filename and bucket.get('Contents'):

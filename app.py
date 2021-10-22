@@ -72,6 +72,8 @@ def webhook(groupId = ''):
 							response.messageObject = response.getRandomCategoryResponse(groupMeGroup)				
 					#send the queued message
 					if response.messageObject:
+						#filepath = f'{g.groupId}/{response.messageObject.awsDirName}/{response.messageObject.awsFileName}'
+						#g.s3Content = AWS.getFileObjFromBucket(config.BUCKET_NAME, filepath)
 						response.responseText = response.messageObject.constructResponseText(payload, response)
 						response.messageObject.updateGroupData()
 						outboundMessage = OutboundMessage.OutboundMessage(response)
