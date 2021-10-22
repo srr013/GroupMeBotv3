@@ -21,7 +21,8 @@ class DefaultMessageType():
         self.helpText = ''
         self.followUpAction = '' #persists a state across message transmissions for a specific message type
         self.messageSourceIndex = '' #persist (single session) the index of the message from the list of available messages
-    
+        self.randomizeResponseChance = 0
+
     def qualifyText(self, text):
         if self.qualifyingText:
             for m in self.qualifyingText:
@@ -49,6 +50,14 @@ class DefaultMessageType():
         self.randLowerBound = randUpperBound
         self.randUpperBound = randUpperBound + self.qualifyingPercent
         return self.randUpperBound
+
+    def randomizeChanceToSendMessage(self):
+        if self.randomizeResponseChance:
+            rand  = random.randint(0,100)
+            if rand < self.randomizeResponseChance:
+                return True
+        return False
+
 
     def stringIsWordInText(self, key, text):
         if key in text:

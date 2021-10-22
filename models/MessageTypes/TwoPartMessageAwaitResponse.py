@@ -10,7 +10,7 @@ class TwoPartMessageAwaitResponse(Default.DefaultMessageType):
         super().__init__(group)
         self.qualifyingText =['twoPartMessageAwaitResponse']
         self.responseType = 'text'
-        self.qualifyingPercent = 20
+        self.qualifyingPercent = 10
         self.messageCategory = 'random'
         self.helpText = "--TwoPartMessageAwaitResponse: Bot sends a message and awaits response from the group before sending another"
         

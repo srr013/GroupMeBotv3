@@ -11,7 +11,7 @@ class TLDR(Default.DefaultMessageType):
         self.helpText = "--tldr: trigger a response from the bot due to a long message"
         
     def qualifyText(self, text):
-        if text.count(' ') > 100:
+        if text.count(' ') > 80:
             return True
         if self.qualifyingText:
             for m in self.qualifyingText:

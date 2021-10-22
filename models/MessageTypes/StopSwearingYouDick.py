@@ -10,8 +10,10 @@ class StopSwearingYouDick(Default.DefaultMessageType):
         self.responseType = 'text'
         self.helpText = f"--StopSwearingYouDick: triggered when you say the following words: {[k for k in stopSwearing.keys()]}"
         self.qualifyingKey = ''
+        self.randomizeResponseChance = 60
 
     def qualifyText(self, text):
+        returnVal = False
         for key in stopSwearing.keys():
             if self.stringIsWordInText(key, text):
                 self.qualifyingKey = key
@@ -22,8 +24,11 @@ class StopSwearingYouDick(Default.DefaultMessageType):
                 l = ["--"+m, "-"+m, "\u2014"+m]
                 for message in l:
                     if message in text.lower():
-                        return True
-        return False
+                        returnVal = True
+        if returnVal:
+            returnVal = self.randomizeChanceToSendMessage()
+            
+        return returnVal
 
     def constructResponseText(self, payload, response):
         key = self.qualifyingKey
