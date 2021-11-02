@@ -22,14 +22,14 @@ function submitForm (element){
     })
 }
 
-function deleteFile (element){
+function deleteFile (element, filetype){
     fileName = element.dataset.file;
     groupId = element.dataset.groupid;
     console.log(fileName);
     parentLi = element.parentElement
     console.log(parentLi)
     $.ajax({
-        url: window.location.origin + '/api/buckets/'+groupId+'?filepath='+fileName,
+        url: window.location.origin + '/api/buckets/'+groupId+'?fileName='+fileName+'&fileType='+filetype,
         type: 'DELETE',
         async: true,
         cache: false,

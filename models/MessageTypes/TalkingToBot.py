@@ -9,7 +9,8 @@ class TalkingToBot(Default.DefaultMessageType):
         self.qualifyingText =['talkingToBot']
         self.responseType = 'text'
         self.helpText = "--talkingToBot: trigger a response from the bot based on a mention of Bot's name"
-        
+        self.content = talkingToBot
+
     def qualifyText(self, text):
         if self.group.bot:
             if self.group.bot.botName.lower() in text.lower():
@@ -28,6 +29,7 @@ class TalkingToBot(Default.DefaultMessageType):
         return False
 
     def constructResponseText(self, payload, response):
-        m = talkingToBot[random.randint(0,len(talkingToBot)-1)]
+        self.messageSourceIndex = random.randint(0,len(self.content)-1)
+        m = self.content[self.messageSourceIndex]['text']
         return m
 

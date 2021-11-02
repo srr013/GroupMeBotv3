@@ -11,9 +11,11 @@ class RandomEncouragement(Default.DefaultMessageType):
         self.responseType = 'text'
         self.messageCategory = 'random'
         self.helpText = '--encourage: bot will send you a pick-me-up'
+        self.content = encouragement.encouragement
 
     def constructResponseText(self, payload, response):
-        m = encouragement.encouragement[random.randint(0,len(encouragement.encouragement)-1)]
+        self.messageSourceIndex = random.randint(0,len(self.content)-1)
+        m = self.content[self.messageSourceIndex]['text']
         return m
 
     def updateGroup(self):

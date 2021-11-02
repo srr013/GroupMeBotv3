@@ -1,14 +1,14 @@
 Flask==1.1.4
 gunicorn==19.6.0
 python-dotenv
-requests
-psycopg2==2.8.4 
+requests==2.26.0
+psycopg2
 Flask-SQLAlchemy===2.4.1
 Flask-Migrate==2.5.2
 Flask-Script==2.0.6
 alembic==1.6.5
 Flask-Cors==3.0.9
 Flask-Login==0.5.0
-GroupyAPI==0.10.3
-yahoo-oauth==0.1.9
+# GroupyAPI==0.10.3
+# yahoo-oauth==0.1.9
 boto3

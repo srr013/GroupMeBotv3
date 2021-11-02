@@ -11,9 +11,12 @@ class RandomInsult(Default.DefaultMessageType):
         self.responseType = 'mention'
         self.messageCategory = 'random'
         self.helpText = '--insult: bot will send a random insult about you'
+        self.content = insults.insults
 
     def constructResponseText(self, payload, response):
-        m = insults.insults[random.randint(0,len(insults.insults)-1)]
+        self.messageSourceIndex = random.randint(0,len(self.content)-1)
+        responseObj = self.content[self.messageSourceIndex]
+        m = responseObj['text']
         addUser = random.randint(1,2)
         if addUser % 2 == 0:
             #get the grammar right
@@ -23,7 +26,7 @@ class RandomInsult(Default.DefaultMessageType):
             #add a second insult to string
             if random.randint(0, 99) > 50:
                 if " " not in m:
-                    m+= " " + insults.insults[random.randint(0,len(insults.insults)-1)]
+                    m+= " " + self.content[random.randint(0,len(self.content)-1)]['text']
             return "@"+payload.get("name") + " is "+a+" "+ m
         else:
             self.responseType = 'text'

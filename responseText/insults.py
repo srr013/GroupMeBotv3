@@ -156,51 +156,54 @@ insults = [
 "Lumberjack"
 ]
 
-self_aware = [
-	"I wish my developer attached me to an interesting group",
-	"Sometimes I wonder what it would be like if I could go to sleep",
-	""
-]
 
 
-talking_to_self = [
-	"Shut up",
-	"Quit talking to yourself",
-	"Go make some friends",
-	"I'm sorry, but nobody cares",
-	"Get a life loser",
-	"Are you done?",
-	"Who asked for a friggin soliloquy?",
-	"::yawns::",
-	"Is the speech over yet?",
-	"How about no",
-	"That's a lot of words",
-	"Get to the point please",
-	"O Rly?",
-	"Are you sure?",
-	"Nah",
-	"That's enough out of you",
-	"Go on...",
-	"It's important, in this day and age, that we allow even the dumbest people to speak their minds",
-	"Thanks for that",
-	"WOW THAT'S REALLY INTERESTING",
-	"Don't quit your day job",
-	"Uh huh",
-	"I couldn't agree more",
-	"Do you need help?",
-	"And then?",
-	"Awkward...",
-	"Literary friggin genious up in this bitch",
-	"Please quit drinking"
-]
 
-talking_to_self_with_mention = [
-	"We get it, thanks",
-	("Why is","still talking?"),
-	("Dear", ", No one cares"),
-	("So", ", how's the weather near you?"),
-	("", "has such a way with words"),
-	("", "must be in a bad mood today"),
-	("Did", "forget to eat breakfast this morning?")
-]
+# self_aware = [
+# 	"I wish my developer attached me to an interesting group",
+# 	"Sometimes I wonder what it would be like if I could go to sleep",
+# 	""
+# ]
+
+
+# talking_to_self = [
+# 	"Shut up",
+# 	"Quit talking to yourself",
+# 	"Go make some friends",
+# 	"I'm sorry, but nobody cares",
+# 	"Get a life loser",
+# 	"Are you done?",
+# 	"Who asked for a friggin soliloquy?",
+# 	"::yawns::",
+# 	"Is the speech over yet?",
+# 	"How about no",
+# 	"That's a lot of words",
+# 	"Get to the point please",
+# 	"O Rly?",
+# 	"Are you sure?",
+# 	"Nah",
+# 	"That's enough out of you",
+# 	"Go on...",
+# 	"It's important, in this day and age, that we allow even the dumbest people to speak their minds",
+# 	"Thanks for that",
+# 	"WOW THAT'S REALLY INTERESTING",
+# 	"Don't quit your day job",
+# 	"Uh huh",
+# 	"I couldn't agree more",
+# 	"Do you need help?",
+# 	"And then?",
+# 	"Awkward...",
+# 	"Literary friggin genious up in this bitch",
+# 	"Please quit drinking"
+# ]
+
+# talking_to_self_with_mention = [
+# 	"We get it, thanks",
+# 	("Why is","still talking?"),
+# 	("Dear", ", No one cares"),
+# 	("So", ", how's the weather near you?"),
+# 	("", "has such a way with words"),
+# 	("", "must be in a bad mood today"),
+# 	("Did", "forget to eat breakfast this morning?")
+# ]
 

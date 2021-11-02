@@ -54,16 +54,17 @@ def getBucketContents(bucketName):
         res = f"Error getting bucket: {bucketName}"
     return res, status
 
-def getFileObjFromBucket(bucket, filepath):
-    bucketFiles = getBucketContents(bucket)
-    if isinstance(bucketFiles, dict):
-        #TODO
-        pass
-    return
-
-
-
-
+def getFileObjFromBucket(bucketName, filepath, bucket={}):
+    if not bucket:
+        bucket = getBucket(bucketName)
+    if isinstance(bucket, dict):
+        contents = [b.get('Key') for b in bucket.get('Contents')]
+        i = contents.index(filepath)
+        if i != -1:
+            for v in bucket['Contents']:
+                if v['Key'] == filepath:
+                    return v
+    return False
 
 def getGroupFileObjsFromBucket(bucket, groupId, directory='',filename=''):
     contents = []
@@ -79,14 +80,31 @@ def getGroupFileObjsFromBucket(bucket, groupId, directory='',filename=''):
         for s3File in bucket.get('Contents'):
             s3FilePath = s3File.get('Key').split("/")
             if s3FilePath[0] == groupId:
+                s3File['Filetype'] = s3FilePath[1]
                 contents.append(s3File)
     else:
         logging.error(f'Bucket has no "Contents" key')
     return contents
 
+def formatS3ContentForGroup(contents, bucket):
+    if isinstance(bucket, str):
+        bucket = getBucket(bucket)
+    groupContent = {'images':[], 'text':{}, 'Name': bucket.get('Name')}
+    for c in contents:
+        l = c['Key'].split('/')
+        if l[1] == 'images':
+            groupContent['images'].append(c)
+        elif l[1] == 'text':
+            if ".json" in l[2]:
+                l[2] = l[2].removesuffix(".json")
+            groupContent['text'][l[2]] = loadJsonFromBucket(bucket, c)
+    return groupContent
+
 def downloadFileFromBucket(bucket, fileObject):
     fn = fileObject.get('Key')
-    fp = os.path.join("temp",fn)
+    if '/' in fn:
+        localfp = fn.split("/")
+    fp = os.path.join("temp",*localfp)
     if bucket.get('Name'):
         try:
             with open(fp, 'wb') as o:
@@ -95,32 +113,55 @@ def downloadFileFromBucket(bucket, fileObject):
             logging.error("No object of name: {} found in bucket")
     return fp
 
-def putFileInBucket(fileName, bucket):
+def loadJsonFromBucket(bucket, fileObject):
+    fp = downloadFileFromBucket(bucket, fileObject)
+    with open(fp, 'r') as data:
+        d = data.read()
+    if d:
+        d = json.loads(d)
+    return d
+
+def formatFilePathForAWS(path):
+    if "_" in path:
+        path = path.replace("_", "/")
+    return path
+
+def formatFilePathForLocal(path):
+    if "_" in path:
+        path = path.split("_")
+    return path
+def putFileInBucket(local_filepath, bucket, aws_filepath):
     try:
         #only filenames that are passed through
-        path = fileName.split("_")
-        fileName = fileName.replace("_", "/")
-        result = s3.upload_file(os.path.join(config.UPLOAD_FOLDER, *path), bucket, fileName)
+        local_filepath = formatFilePathForLocal(local_filepath)
+        aws_filepath = formatFilePathForAWS(aws_filepath)
+        result = s3.upload_file(os.path.join(*local_filepath), bucket, aws_filepath)
     except Exception as e:
         logging.error(f'File upload failed with error: {e}')
-        return f"Error uploading file: {fileName}", 404
-    return f"{fileName} uploaded successfully or already present", 200
+        return f"Error uploading file: {aws_filepath}", 404
+    return f"{aws_filepath} uploaded successfully or already present", 200
 
-def deleteFileInBucket(fileName, bucketName):
+def deleteFileInBucket(filepath, bucketName):
     bucket = getBucket(bucketName)
+    filepath = formatFilePathForAWS(filepath)
     # if getGroupFileObjsFromBucket(bucket, filename=fileName):
     try:
-        s3.delete_object(Bucket=bucketName,Key=fileName)
-        res = f"{fileName} deleted successfully"
-        status = 200
+        if getFileObjFromBucket(bucketName, filepath):
+            s3.delete_object(Bucket=bucketName,Key=filepath)
+            res = f"{filepath} deleted successfully"
+            status = 200
+        else:
+            res = f"File {filepath} not found"
+            status = 404
     except Exception as e:
         logging.error(f'File deletion failed with error: {e}')
-        res = f"Error deleting file {fileName}"
-        status = 404
+        res = f"Error deleting file {filepath}"
+        status = 400
     # else:
-    #     res = f"{fileName} not found in bucket"
+    #     res = f"{filepath} not found in bucket"
     #     status = 404
     return res, status
+
 
 	# 	for bucket in s3.buckets.
 	

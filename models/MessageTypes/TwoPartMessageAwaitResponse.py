@@ -3,7 +3,7 @@ from sqlalchemy.orm.attributes import flag_modified
 import models.MessageTypes._DefaultMessageType as Default
 import logging
 import random
-from responseText.TwoPartMessageAwaitResponse import responses
+from responseText.TwoPartMessageAwaitResponse import responses as TwoPartMessageAwaitResponse
 
 class TwoPartMessageAwaitResponse(Default.DefaultMessageType):
     def __init__(self, group):
@@ -13,7 +13,8 @@ class TwoPartMessageAwaitResponse(Default.DefaultMessageType):
         self.qualifyingPercent = 10
         self.messageCategory = 'random'
         self.helpText = "--TwoPartMessageAwaitResponse: Bot sends a message and awaits response from the group before sending another"
-        
+        self.content = TwoPartMessageAwaitResponse
+
     def qualifyText(self, text):
         if self.qualifyingText:
             for m in self.qualifyingText:
@@ -25,11 +26,12 @@ class TwoPartMessageAwaitResponse(Default.DefaultMessageType):
         return False
 
     def constructResponseText(self, payload, response):
-        if self.followUpAction == '':
-            self.messageSourceIndex = random.randint(0,len(responses)-1)
-            m = responses[self.messageSourceIndex][0]
+        if self.messageSourceIndex == None:
+            self.messageSourceIndex = random.randint(0,len(self.content)-1)
+            m = self.content[self.messageSourceIndex]['text'][0]
+            self.doNotDecrement = True
         else:
-            m = responses[int(self.followUpAction)][1]
+            m = self.content[int(self.messageSourceIndex)]['text'][1]
         return m
 
     def updateGroup(self):

@@ -9,7 +9,8 @@ class TLDR(Default.DefaultMessageType):
         self.qualifyingText =['tldr']
         self.responseType = 'text'
         self.helpText = "--tldr: trigger a response from the bot due to a long message"
-        
+        self.content = tldr
+
     def qualifyText(self, text):
         if text.count(' ') > 80:
             return True
@@ -22,6 +23,7 @@ class TLDR(Default.DefaultMessageType):
         return False
 
     def constructResponseText(self, payload, response):
-        m = tldr[random.randint(0,len(tldr)-1)]
+        self.messageSourceIndex = random.randint(0,len(self.content)-1)
+        m = self.content[self.messageSourceIndex]['text']
         return m
 

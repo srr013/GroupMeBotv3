@@ -97,3 +97,18 @@ stopSwearing = {
     'ass': ass,
     'asshole': ass
 }
+
+import json
+import os
+d = {}
+for k,v in stopSwearing.items():
+    d[k] = []
+    for i in v:
+        obj = {
+            'text': i,
+            'lastUsedDate': ''
+        }
+        d[k].append(obj)
+
+with open(os.path.join("temp", "55536872", "text", "StopSwearingYouDick.json"), "w+") as f:
+	f.write(json.dumps(d))

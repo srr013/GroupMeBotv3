@@ -51,7 +51,7 @@ class Response():
                     #finds the appropriate messageType and sets an action within it for use in response construction
                     #allows storage of a follow-up command for a given message type across messages
                     if messageType.get('action', None) is not None and messageType['name'] == m.__class__.__name__:
-                        m.followUpAction = messageType['action']
+                        m.messageSourceIndex = messageType['action']
                         return m
         return {}
 
@@ -96,6 +96,7 @@ class Response():
                     #Note - "requested path doesn't exist error might mean bot ID doesn't exist"
                     res = f"Response failed with {resp.status_code}: {resp.text}"
             else:
+                statusCode = 202
                 res = "Message not sent due to sendMessage Paramter. Message: "+self.responseText
         else:
             res = "No message object set in response"

@@ -10,3 +10,5 @@ encouragement = [
 	"There you go!",
 	"Right on."
 ]
+
+

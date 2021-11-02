@@ -1,3 +1,18 @@
+General
+- list of images must be synched with the images in the bucket. Instead of manually 
+updating the list why not generate the list dynamically based on the bucket?
+The separate JSON file can be rectified against the bucket at runtime, and is
+used just to store the last sent date.
+- Updating a file from front-end. API exists, just need to be able to add text and
+specify the appropriate response type.
+- test all response types
+
+
+StopSwearing
+- Use of a dict as source instead of a list is problematic. Could change to just
+using multiple files and simplify. Then add some unique string searching to each file
+to accomodate different forms of the word.
+- Not using integration currently.
 
 
 Need an API for each action from the front end. What does the action do in the database? 

@@ -2,6 +2,7 @@ import models.MessageTypes._DefaultMessageType as Default
 import logging
 import os
 import random
+import services.aws as aws
 import responseText.images as images
 
 class RandomImage(Default.DefaultMessageType):
@@ -12,10 +13,24 @@ class RandomImage(Default.DefaultMessageType):
         self.responseType = 'image'
         self.messageCategory = 'random'
         self.helpText = '--image: bot will send a random image'
+        self.content = images.meme_files
 
     def constructResponseText(self, payload, response):
-        m = os.path.join("static","images", images.meme_files[random.randint(0, len(images.meme_files)-1)])
-        return m
+        self.messageSourceIndex = random.randint(0,len(self.content)-1)
+        objName = self.content[self.messageSourceIndex]['text']
+        obj = ''
+        for i in self.group.s3Content['images']:
+            fileName = i['Key'].split("/")[2]
+            if fileName == objName:
+                obj = i
+                break
+        if i and obj:
+            if not self.group.s3Content:
+                m = os.path.join("static","images", objName)
+            else:
+                m = aws.downloadFileFromBucket({'Name': self.group.s3Content['Name']}, obj)
+            return m
+        return "None"
 
     def updateGroup(self):
         self.group.counter_current = 0

@@ -25,7 +25,7 @@
                 {% for image in fileList['images'] %}
                     <li>
                         <a href="/api/files/{{groupId}}/images/{{image}}">{{ image }}</a>
-                        <button onclick="deleteFile(this)" data-file={{image}} data-groupid={{groupId}}>Delete</button>
+                        <button onclick="deleteFile(this, 'images')" data-file={{image}} data-groupid={{groupId}}>Delete</button>
                     </li>
                 {% endfor %}
                 </ul>
@@ -33,7 +33,7 @@
                     {% for response in fileList['text'] %}
                         <li>
                             <a href="/api/files/{{groupId}}/text/{{response}}">{{ response }}</a>
-                            <button onclick="deleteFile(this)" data-file={{response}} data-groupid={{groupId}}>Delete</button>
+                            <button onclick="deleteFile(this, 'text')" data-file={{response}} data-groupid={{groupId}}>Delete</button>
                         </li>
                     {% endfor %}
                 </ul>
